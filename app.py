@@ -17,8 +17,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# LOGO DO GRAXINIM COM ÍCONE DO SISTEMA
-col_logo, col_texto_topo = st.columns()
+# 🚨 LINHA RETIFICADA AQUI: Adicionado o número 2 para fixar o cabeçalho do Graxinim! 🚨
+col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim Chefe - Buscando manuais e diagramas técnicos automotivos! 🛠️🚘</p>', unsafe_allow_html=True)
@@ -139,14 +139,12 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
         else:
-            # 🚨 SISTEMA RETIFICADO 100% PLANO: Abas independentes sem validações internas de recuo 🚨
             aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
-                "📚 Manuais em PDF", "🖼️ Fotos e Imagens", "💬 Fóruns Mecânicos", "🎥 Vídeos e Macetes", "🌐 Portais Gerais"
+                "📚 Manuais em PDF", "🖼️ Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 Vídeos e Macetes", "🌐 Portais Gerais"
             ])
             
             termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
 
-            # Processamento linear e sequencial limpo
             for item in resultados:
                 link = item.get("url", "")
                 titulo = item.get("title", "")
@@ -167,6 +165,5 @@ if botao_buscar:
                 else:
                     aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {titulo}</h4><a href="{link}" target="_blank">🔗 Abrir Link Geral</a></div>', unsafe_allow_html=True)
 
-            # Envio direto das fotos encontradas para a aba 2
             for img_url in imagens_encontradas[:6]:
                 aba_img.image(img_url, use_container_width=True)
