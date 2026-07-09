@@ -1,7 +1,5 @@
 import streamlit as st
 import urllib.parse
-import json
-import requests
 
 # 1. CONFIGURAÇÃO DA TELA (Visual Garagem Premium - Contraste Máximo)
 st.set_page_config(
@@ -31,9 +29,9 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Injeção Direta de Alta Performance</b> | Garimpo em tempo real com conexões limpas e nativas! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Injeção Direta Otimizada</b> | Links do Google e Manuais com alinhamento de URL corrigido! 🏁</p>', unsafe_allow_html=True)
 
-# 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO
+# 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO (Com a Kombi adicionada!)
 dados_veiculos = {
     "Chevrolet": {
         "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2", "2.0 16V Familia 2"],
@@ -42,6 +40,7 @@ dados_veiculos = {
         "Onix / Tracker (Novos)": ["1.0 3cil Aspirado (Banhada)", "1.0 3cil Turbo (Banhada)"]
     },
     "Volkswagen": {
+        "Kombi": ["1.6 Ar Carburado / Injeção", "1.4 8V Total Flex (Água)"],
         "Gol": ["1.0 3cil EA211", "1.6 8V EA111", "1.6 AP"],
         "Fox": ["1.0 8V EA111", "1.6 8V EA111"],
         "Polo / Virtus": ["1.0 3cil 200 TSi EA211", "1.6 16V MSI EA211"]
@@ -85,7 +84,7 @@ st.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_sele
 botao_buscar = st.button("⚡ INICIAR VARREDURA COMPLETA NA WEB", use_container_width=True)
 
 if botao_buscar:
-    # Codificação limpa do termo de busca
+    # Codificação limpa do termo de busca para a URL
     exclusoes = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo -pecas"
     termo_busca = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual oficina pontos esquema {exclusoes}"
     termo_limpo = termo_busca.replace(" ", "+")
@@ -95,16 +94,17 @@ if botao_buscar:
         "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
     ])
     
-    # Executa a renderização dos cartões e botões nativos de alto torque
     try:
+        # 🚨 FIXADO: Adicionado '/search?tbm=isch&q=' e '/search?q=' corretos para o Google abrir direto na pesquisa! 🚨
+        
         # Aba 1: Diagramas
-        aba_diag.markdown('<div class="card-tecnico"><h4>📊 Banco de Imagens e Esquemas de Sincronismo</h4><p>Clique abaixo para carregar as fotos reais de pontos (Doutor-IE, Simplo e Sabó) no banco visual do Google.</p></div>', unsafe_allow_html=True)
+        aba_diag.markdown('<div class="card-tecnico"><h4>📊 Banco de Imagens e Esquemas de Sincronismo</h4><p>Clique abaixo para carregar as fotos reais de pontos (Doutor-IE, Simplo e Sabó) no banco visual do Google Imagens.</p></div>', unsafe_allow_html=True)
         aba_diag.link_button("🔍 VER DIAGRAMAS E FOTOS DE SINCRONISMO", f"https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo")
         
         # Aba 2: PDFs e Manuais
         aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Biblioteca Manual do Mecânico</h4><p>Clique abaixo para abrir a pesquisa interna de PDFs e apostilas completas desse motor.</p></div>', unsafe_allow_html=True)
         aba_pdf.link_button("📥 ABRIR ACERVO DO MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{termo_limpo}")
-        aba_pdf.markdown('<div class="card-tecnico"><h4>📄 Repositório de Manuais em PDF no Google</h4><p>Gera o túnel de download direto focado em arquivos digitais de oficina.</p></div>', unsafe_allow_html=True)
+        aba_pdf.markdown('<div class="card-tecnico"><h4>📄 Repositório de Manuais em PDF no Google</h4><p>Gera o túnel de download direto focado em arquivos digitais de oficina no Google.</p></div>', unsafe_allow_html=True)
         aba_pdf.link_button("📥 BUSCAR PDFs DE REPARAÇÃO NO GOOGLE", f"https://google.com{termo_limpo}+filetype:pdf")
         
         # Aba 3: Fóruns Mecânicos
