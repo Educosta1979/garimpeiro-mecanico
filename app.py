@@ -1,33 +1,37 @@
 import streamlit as st
 from tavily import TavilyClient
 
-# 1. CONFIGURAÇÃO DA TELA (Front-End)
+# 1. CONFIGURAÇÃO DA TELA (Layout Garagem de Alta Performance)
 st.set_page_config(
-    page_title="Central do Graxinim - Literatura Automotiva", 
+    page_title="Garagem do Graxinim - Literatura Automotiva", 
     page_icon="🦝", 
     layout="wide"
 )
 
-# Estilização visual limpa e direta
+# Estilização CSS: Visual de Oficina Premium / Garagem Noturna
 st.markdown("""
     <style>
-    .main-title { font-size:32px !important; font-weight: bold; color: #1E3A8A; margin-bottom: 5px; }
-    .sub-title { font-size:16px !important; color: #4B5563; margin-bottom: 25px; }
-    .card-tecnico { background-color: #FFFFFF; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #E5E7EB; border-left: 6px solid #1E3A8A; }
+    .stApp { background-color: #111827; color: #F3F4F6; }
+    .main-title { font-size:36px !important; font-weight: bold; color: #3B82F6; margin-bottom: 5px; text-shadow: 2px 2px 4px #000; }
+    .sub-title { font-size:16px !important; color: #9CA3AF; margin-bottom: 25px; }
+    .card-tecnico { background-color: #1F2937; padding: 18px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #374151; border-left: 6px solid #EF4444; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
+    .stTabs [data-baseweb="tab-list"] { background-color: #1F2937; padding: 10px; border-radius: 8px; }
+    .stTabs [data-baseweb="tab"] { color: #9CA3AF !important; font-weight: bold; }
+    .stTabs [aria-selected="true"] { color: #3B82F6 !important; border-bottom-color: #3B82F6 !important; }
     </style>
 """, unsafe_allow_html=True)
 
-# 🚨 LINHA RETIFICADA AQUI: Adicionado o número 2 para fixar o cabeçalho do Graxinim! 🚨
+# CABEÇALHO DA GARAGEM
 col_logo, col_texto_topo = st.columns(2)
-col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim Chefe - Buscando manuais e diagramas técnicos automotivos! 🛠️🚘</p>', unsafe_allow_html=True)
+col_logo.markdown("<h1 style='font-size: 90px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Literatura Mecânica de Precisão</b> | Analisando Doutor-IE, Simplo e Fóruns Técnicos sem enrolação eletrônica! 🔧🏁</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
 client = TavilyClient(api_key=TAVILY_API_KEY)
 
-# 3. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO
+# 3. BANCO DE DADOS DE VEÍCULOS EXPANDIDO
 dados_veiculos = {
     "Chevrolet": {
         "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2", "2.0 16V Familia 2"],
@@ -36,93 +40,69 @@ dados_veiculos = {
         "Cruze": ["1.4 16V Turbo Ecotec", "1.8 16V Ecotec Flex"],
         "Meriva / Montana / Agile": ["1.4 8V Econoflex", "1.8 8V Powertrain"],
         "Onix / Tracker (Novos)": ["1.0 3cil Aspirado (Banhada)", "1.0 3cil Turbo (Banhada)", "1.2 3cil Turbo CSS Prime"],
-        "Onix / Cobalt / Spin (Antigos)": ["1.0 8V SPE/4", "1.4 8V SPE/4", "1.8 8V Econoflex"],
         "S10 / Trailblazer": ["2.8 16V Duramax Diesel", "2.4 8V Flexpower", "2.5 16V Ecotec Flex"],
         "Vectra / Zafira": ["2.0 8V Flexpower", "2.2 8V / 16V", "2.4 16V Flexpower"]
     },
     "Volkswagen": {
         "Amarok": ["2.0 16V Turbo Diesel", "3.0 V6 Turbo Diesel"],
         "Gol / Voyage / Saveiro / Parati": ["1.0 16V AT", "1.0 8V AT", "1.6 / 1.8 / 2.0 AP", "1.0 8V EA111", "1.6 8V EA111", "1.0 3cil EA211", "1.6 16V MSI EA211"],
-        "Golf / Jetta / Tiguan": ["1.4 16V TSi EA211", "2.0 TSi EA888 (Corrente)", "2.0 TSi EA113 (Correia)", "2.5 20V 5 Cilindros"],
-        "Fox / CrossFox / SpaceFox": ["1.0 8V EA111", "1.6 8V EA111", "1.6 16V MSI EA211"],
-        "Polo / Virtus / Nivus / T-Cross": ["1.0 3cil 200 TSi EA211", "1.0 3cil 170 TSi", "1.6 16V MSI EA211", "1.4 250 TSi EA211"],
-        "Up!": ["1.0 3cil 12V MPI EA211", "1.0 3cil 12V TSi EA211"]
+        "Golf / Jetta / Tiguan": ["1.4 16V TSi EA211", "2.0 TSi EA888 (Corrente)", "2.0 TSi EA113 (Correia)"],
+        "Polo / Virtus / Nivus / T-Cross": ["1.0 3cil 200 TSi EA211", "1.6 16V MSI EA211", "1.4 250 TSi EA211"]
     },
     "Fiat": {
         "Argo / Cronos / Pulse / Fastback": ["1.0 3cil Firefly", "1.3 4cil Firefly", "1.0 3cil Turbo T200", "1.3 4cil Turbo T270"],
-        "Toro / Mobi / Uno / Strada": ["1.8 16V E.torQ", "2.0 16V Multijet Diesel", "1.0 8V Fire / Fire Evo", "1.4 8V Fire Evo", "1.3 Firefly"],
+        "Toro / Mobi / Uno / Strada": ["1.8 16V E.torQ", "2.0 16V Multijet Diesel", "1.0 8V Fire Evo", "1.4 8V Fire Evo"],
         "Ducato": ["2.3 16V Multijet Diesel", "2.8 Turbo Diesel"]
-    },
-    "Jeep": {
-        "Renegade / Compass / Commander": ["1.8 16V E.torQ", "2.0 16V Multijet Diesel", "1.3 Turbo Flex T270", "2.0 Flex Tigershark"]
     },
     "Ford": {
         "Ka / EcoSport (3 Cilindros)": ["1.0 3cil Ti-VCT (Banhada)", "1.5 3cil Dragon (Banhada)"],
-        "Fiesta / Focus / EcoSport": ["1.0 Zetec Rocam", "1.6 Zetec Rocam", "1.6 16V Sigma", "2.0 16V Duratec HE"],
+        "Fiesta / Focus / EcoSport": ["1.6 Zetec Rocam", "1.6 16V Sigma", "2.0 16V Duratec HE"],
         "Ranger": ["2.2 16V Duratorq Diesel", "3.2 20V Duratorq Diesel", "2.3 Duratec Flex"]
-    },
-    "Toyota": {
-        "Corolla / Corolla Cross": ["1.8 16V VVT-i", "2.0 16V Dual VVT-i", "2.0 16V Dynamic Force"],
-        "Hilux / SW4": ["2.5 16V D-4D", "2.8 D-4D 1GD-FTV", "3.0 D-4D 1KD-FTV", "2.7 16V VVT-i Flex"],
-        "Etios / Yaris": ["1.3 16V Dual VVT-i", "1.5 16V Dual VVT-i"]
-    },
-    "Honda": {
-        "Civic": ["1.7 16V VTEC", "1.8 16V i-VTEC", "2.0 16V i-VTEC", "1.5 16V Turbo"],
-        "Fit / City / HR-V": ["1.4 8V i-DSI", "1.5 16V i-VTEC Flex", "1.8 16V i-VTEC"]
-    },
-    "Renault": {
-        "Kwid / Logan / Sandero": ["1.0 3cil 12V SCe", "1.6 16V SCe H4M", "1.0 16V D4D", "1.6 16V K4M"],
-        "Duster / Oroch / Captur": ["2.0 16V F4R", "1.6 16V SCe", "1.3 Flex Turbo TCe"],
-        "Master": ["2.3 16V dCi Turbo Diesel"]
-    },
-    "Hyundai / Kia": {
-        "HB20 / HB20S / Creta": ["1.0 3cil Kappa", "1.0 3cil Kappa Turbo GDI", "1.6 16V Gamma", "2.0 16V Nu Flex"],
-        "HR / Bongo / Tucson": ["2.5 Diesel Turbo D4CB", "2.5 Diesel Turbo D4BH", "2.0 16V Beta"]
     }
 }
 
 # 4. MONTAGEM DO MENU LATERAL
-st.sidebar.header("📋 Filtros de Seleção Técnica")
+st.sidebar.header("📋 Seleção Mecânica")
 
 lista_fabricantes = sorted(list(dados_veiculos.keys()))
-fabricante_selecionada = st.sidebar.selectbox("1. Escolha a Fabricante:", lista_fabricantes)
+fabricante_selecionada = st.sidebar.selectbox("1. Fabricante:", lista_fabricantes)
 
 lista_veiculos = sorted(list(dados_veiculos[fabricante_selecionada].keys()))
-veiculo_selecionado = st.sidebar.selectbox("2. Escolha o Veículo:", lista_veiculos)
+veiculo_selecionado = st.sidebar.selectbox("2. Veículo:", lista_veiculos)
 
 lista_motores = dados_veiculos[fabricante_selecionada][veiculo_selecionado]
-motor_selecionado = st.sidebar.selectbox("3. Escolha a Motorização:", lista_motores)
+motor_selecionado = st.sidebar.selectbox("3. Motorização:", lista_motores)
 
 lista_anos = ["Não Informar (Buscar Todos)"] + [str(ano) for ano in range(2000, 2027)]
-ano_selecionado = st.sidebar.selectbox("4. Ano do Modelo (Opcional):", lista_anos, index=0)
+ano_selecionado = st.sidebar.selectbox("4. Ano do Modelo:", lista_anos, index=0)
 
+# 🚨 RETIRADA A OPÇÃO DE BUSCA POR MANUAIS NO SELETOR - FOCO TOTAL EM CONJUNTO TÉCNICO 🚨
 tipo_material = st.sidebar.radio(
-    "5. Tipo de Literatura Exigida:",
+    "5. Linha de Pesquisa:",
     [
-        "Diagrama Sincronismo Pontos", 
-        "Instalacao Correia Poly-V", 
-        "Torque Cabecote Ordem Aperto"
+        "Sincronismo do Motor (Pontos e Marcas)", 
+        "Esquema de Passagem da Correia Poly-V"
     ]
 )
 
-st.sidebar.write("---")
-st.sidebar.subheader("⚙️ Opções Adicionais")
-incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
-
-# 5. MONTAGEM DO COMANDO
+# 5. MONTAGEM DO COMANDO ROBUSTO
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
 
-comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos"
+# Comando expandido injetando gatilhos fortes para forçar o retorno dos fóruns mecânicos
+comando_pesquisa = (
+    f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} "
+    f"manual oficina diagramas esquema \"oficina brasil\" OR \"reparador\" OR \"resolvido\" OR \"defeito\" {exclusoes_ajustadas}"
+)
 
 # Painel Central de Informações
 col_info, col_btn = st.columns(2)
-col_info.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-botao_buscar = col_btn.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
+col_info.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
+botao_buscar = col_btn.button("⚡ DAR A PARTIDA NO GARIMPO", use_container_width=True)
 
 # 6. PROCESSAMENTO
 if botao_buscar:
-    with st.spinner("🤖 Graxinim varrendo a internet..."):
+    with st.spinner("🤖 Graxinim vasculhando as bancadas da internet..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
@@ -133,37 +113,69 @@ if botao_buscar:
             resultados = resposta_ia.get("results", [])
             imagens_encontradas = resposta_ia.get("images", [])
         except Exception as e:
-            st.error(f"❌ Falha de comunicação: {e}")
+            st.error(f"❌ Falha no circuito de rede: {e}")
             resultados, imagens_encontradas = [], []
 
         if not resultados:
-            st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
+            st.error("❌ Nenhuma literatura ou imagem foi localizada pelo Graxinim.")
         else:
-            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
-                "📚 Manuais em PDF", "🖼️ Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 Vídeos e Macetes", "🌐 Portais Gerais"
-            ])
+            # Novas gavetas incluindo a separação entre diagramas e manuais
+            lista_diagramas = []
+            lista_manuais = []
+            lista_foruns = []
+            lista_videos = []
             
-            termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
+            plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram"]
+            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "topico"]
 
             for item in resultados:
-                link = item.get("url", "")
-                titulo = item.get("title", "")
-                link_min = link.lower()
-                tit_min = titulo.lower()
+                link = item.get("url", "").lower()
+                titulo = item.get("title", "").lower()
                 
-                if not incluir_manual_proprietario and any(t in tit_min for t in termos_bloqueados):
+                # Ignora cartilhas de condutor
+                if any(t in titulo for t in ["proprietario", "usuario", "condutor", "owner"]):
                     continue
 
-                if any(p in link_min for p in ["youtube", "youtu.be", "tiktok", "instagram"]):
-                    aba_video.markdown(f"#### 🎥 {titulo}")
-                    aba_video.markdown(f"[🔗 Abrir Link do Vídeo]({link})")
-                    aba_video.write("---")
-                elif link_min.endswith(".pdf") or "pdf" in tit_min:
-                    aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {titulo}</h4><a href="{link}" target="_blank">📥 Abrir/Baixar PDF</a></div>', unsafe_allow_html=True)
-                elif any(f in link_min for f in ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]):
-                    aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {titulo}</h4><a href="{link}" target="_blank">🔗 Acessar Fórum</a></div>', unsafe_allow_html=True)
+                if any(p in link for p in plataformas_video):
+                    lista_videos.append(item)
+                elif any(f in link for f in sites_foruns) or any(f in titulo for f in sites_foruns):
+                    lista_foruns.append(item)
+                # 🚨 SEPARAÇÃO: Se contiver palavras de imagem ou esquema, vai para Diagramas, se for arquivo denso vai para Manuais
+                elif any(d in titulo or d in link for d in ["diagrama", "esquema", "ponto", "sincronismo", "imagem", "foto"]):
+                    lista_diagramas.append(item)
                 else:
-                    aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {titulo}</h4><a href="{link}" target="_blank">🔗 Abrir Link Geral</a></div>', unsafe_allow_html=True)
+                    lista_manuais.append(item)
+            
+            # 🚨 NOVAS ABAS DA GARAGEM REORGANIZADAS 🚨
+            aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
+                "📊 1. Diagramas de Ponto", 
+                "📚 2. Manuais Completos", 
+                "🖼️ 3. Fotos e Miniaturas", 
+                "💬 4. Fóruns Mecânicos", 
+                "🎥 5. Vídeos e Macetes"
+            ])
+            
+            # Aba 1: Diagramas Rápidos
+            if not lista_diagramas: aba_diag.info("Nenhum link focado em diagrama isolado foi detectado. Veja a aba de manuais.")
+            for item in lista_diagramas:
+                aba_diag.markdown(f'<div class="card-tecnico"><h4>📊 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">🔍 Abrir Esquema Visual</a></div>', unsafe_allow_html=True)
 
-            for img_url in imagens_encontradas[:6]:
-                aba_img.image(img_url, use_container_width=True)
+            # Aba 2: Manuais de Oficina
+            if not lista_manuais: aba_pdf.info("Nenhum manual completo em formato PDF extenso foi localizado.")
+            for item in lista_manuais:
+                aba_pdf.markdown(f'<div class="card-tecnico"><h4>📚 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir Manual Técnico / Scribd / PDF</a></div>', unsafe_allow_html=True)
+
+            # Aba 3: Imagens e Previews (FILTRAGEM DE DESCRIÇÃO ANTI-GUAXINIM FESTA)
+            # 🛡️ PENTE FINO: Só deixa passar a foto se na URL ou na tag tiver termos puros da mecânica automotiva
+            termos_mecanicos = ["motor", "sincronismo", "correia", "corrente", "torque", "car", "auto", "mecanic", "astra", "chevrolet", "valvula", "passagem", "poly", "tensionador", "polia"]
+            imagens_filtradas = [img for img in imagens_encontradas if any(t in img.lower() for t in termos_mecanicos)]
+            
+            if not imagens_filtradas: 
+                aba_img.info("Nenhum diagrama limpo em imagem isolada foi extraído de forma direta.")
+            for url_foto in imagens_filtradas[:6]:
+                aba_img.image(url_foto, use_container_width=True)
+                aba_img.write("---")
+
+            # Aba 4: Fóruns Mecânicos (Combustível aditivado nos resultados)
+            if not lista_foruns: aba_forum.info("Nenhum tópico de debate aberto foi localizado para este motor.")
+            for item in lista_foruns:
