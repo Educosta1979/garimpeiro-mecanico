@@ -16,8 +16,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">⚙️ Central de Literatura Técnico Automotiva</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Garimpo Inteligente Separado por Vídeos Práticos e Materiais Didáticos de Engenharia</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Garimpo de Precisão de Diagramas Mecânicos e Vídeos de Sincronismo</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -96,36 +96,41 @@ tipo_material = st.sidebar.radio(
 )
 
 st.sidebar.write("---")
-st.sidebar.subheader("⚙️ Configurações Extra")
+st.sidebar.subheader("⚙️ Filtros Avançados")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM ULTRA-COMPACTA DA BUSCA (Garante ficar abaixo dos 400 caracteres)
-# Reduzimos drasticamente o tamanho das exclusões para economizar combustível de texto
-exclusoes_curtas = "-mercadolivre -olx -shopee -aliexpress -comprar -preco -venda"
+# 5. MONTAGEM RESTRITA DA CONSULTA (Foco Máximo em Literatura Especializada)
+# Bloqueio agressivo de termos de comércio e manuais de condutor
+exclusoes_filtros = "-mercadolivre -olx -shopee -aliexpress -comprar -preco -venda -catalogo"
 
 if not incluir_manual_proprietario:
-    exclusoes_curtas += ' -"proprietario" -"condutor"'
+    exclusoes_filtros += ' -"proprietario" -"usuario" -"condutor" -"owner"'
 
-# Monta a frase final de forma enxuta e direta
-comando_pesquisa = f'"{tipo_material}" motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {ano_selecionado} "manual tecnico" {exclusoes_curtas}'
+# Bloqueia as outras marcas concorrentes para não misturar resultados na tela
+outras_marcas = [marca for marca in lista_fabricantes if marca != fabricante_selecionada]
+for marca in outras_marcas:
+    exclusoes_filtros += f" -{marca.lower()}"
+
+# Monta o comando final otimizado de busca
+comando_pesquisa = f'"{tipo_material}" "{fabricante_selecionada} {veiculo_selecionado}" motor "{motor_selecionado}" {ano_selecionado} "manual tecnico" {exclusoes_filtros}'
 
 # Painel Central de Informações
 col1, col2 = st.columns(2)
 with col1:
-    st.info(f"⚙️ **Filtro Ativo:**\n\n*{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado} ({ano_selecionado})*\n\n🛠️ *Componente: {tipo_material}*")
+    st.info(f"⚙️ **Filtro de Engenharia Ativo:**\n\n*Carro:* **{fabricante_selecionada} {veiculo_selecionado}**\n\n*Motorização:* **{motor_selecionado} ({ano_selecionado})**\n\n🛠️ *Buscar:* **{tipo_material}**")
 with col2:
     st.write("")
     st.write("")
     botao_buscar = st.button("🚀 Garimpar Literatura Avançada", use_container_width=True)
 
-# 6. PROCESSAMENTO E EXIBIÇÃO EM ABAS SEPARADAS
+# 6. PROCESSAMENTO, FILTRAGEM PÓS-BUSCA E EXIBIÇÃO EM ABAS SEPARADAS
 if botao_buscar:
-    with st.spinner("🤖 Vasculhando acervos de engenharia e plataformas didáticas..."):
+    with st.spinner("🤖 Vasculhando acervos de engenharia e separando mídias técnicas..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=8
+                max_results=10 # Puxa mais dados para filtrar melhor
             )
             resultados = resposta_ia.get("results", [])
         except Exception as e:
@@ -138,21 +143,45 @@ if botao_buscar:
             lista_videos = []
             lista_manuais = []
             
+            # Palavras-chave que indicam plataformas de vídeo
+            plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram", "facebook", "kwai", "video"]
+            
             for item in resultados:
-                link = item.get("url", "")
-                if "youtube" in link.lower() or "youtu.be" in link.lower():
+                titulo = item.get("title", "").lower()
+                link = item.get("url", "").lower()
+                resumo = item.get("content", "").lower()
+                
+                # 🛡️ PENTE FINO 1: Descarta manuais de proprietário se a caixinha estiver desmarcada
+                if not incluir_manual_proprietario:
+                    if any(p in titulo or p in resumo for p in ["proprietario", "usuario", "condutor", "owner"]):
+                        continue
+                
+                # 🛡️ PENTE FINO 2: Garante que o resultado pertence à marca selecionada
+                # Se buscou Chevrolet, elimina se o título contiver Fiat, Ford ou Volkswagen de intruso
+                marca_intrusa = False
+                for marca in outras_marcas:
+                    if marca.lower() in titulo:
+                        marca_intrusa = True
+                        break
+                if marca_intrusa:
+                    continue
+
+                # 🛡️ TRIAGEM DE MÍDIA: Identifica se é vídeo (YouTube, TikTok, etc) ou se é Manual de Leitura
+                e_video = any(plataforma in link for plataforma in plataformas_video) or "video" in titulo
+                
+                if e_video:
                     lista_videos.append(item)
                 else:
                     lista_manuais.append(item)
             
-            # Abas visuais
-            aba_manuais, aba_videos = st.tabs(["📚 Literaturas e Manuais Didáticos", "🎥 Vídeos Práticos e Macetes"])
+            # Renderização das Abas na Tela
+            aba_manuais, aba_videos = st.tabs(["📚 Literaturas, Diagramas e Manuais Técnicos", "🎥 Vídeos Práticos, Shorts e Macetes"])
             
             with aba_manuais:
                 if not lista_manuais:
-                    st.info("Nenhum arquivo de manual em PDF foi encontrado para este termo.")
+                    st.info("Nenhum arquivo de manual didático em texto/PDF passou pelos filtros técnicos. Tente termos aproximados ou veja a aba de vídeos.")
                 else:
-                    st.success(f"Encontramos {len(lista_manuais)} esquemas técnicos didáticos:")
+                    st.success(f"Encontramos {len(lista_manuais)} literaturas e esquemas técnicos específicos:")
                     for i, item in enumerate(lista_manuais):
                         with st.container():
                             st.markdown(f"#### 📄 {i+1}. {item.get('title')}")
@@ -162,12 +191,13 @@ if botao_buscar:
             
             with aba_videos:
                 if not lista_videos:
-                    st.info("Nenhum vídeo técnico explicativo foi encontrado. Altere para buscar esquemas nas abas ou tente termos aproximados.")
+                    st.info("Nenhum vídeo técnico explicativo passou pelos filtros para este motor nas plataformas (YouTube/TikTok).")
                 else:
-                    st.success(f"Encontramos {len(lista_videos)} vídeos com o procedimento prático:")
+                    st.success(f"Encontramos {len(lista_videos)} vídeos práticos de manutenção:")
                     for i, item in enumerate(lista_videos):
                         with st.container():
                             st.markdown(f"#### 🎥 {i+1}. {item.get('title')}")
                             st.write(f"**Dica do vídeo:** {item.get('content')}")
-                            st.video(item.get('url'))
-                            st.write("---")
+                            
+                            url_video = item.get('url')
+                            # Se for link comum do YouTube ou TikTok, o Streamlit renderiza o player na tela
