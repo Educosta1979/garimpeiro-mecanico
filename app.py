@@ -25,45 +25,28 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Alta Performance Blindado</b> | Caminhos curtos de bancada com foco em literatura técnica automotiva! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Triagem Cirúrgica de Links</b> | Separando diagramas, PDFs e fóruns nas gavetas certas! 🏁</p>', unsafe_allow_html=True)
 
-# 2. CHAVE TAVILY (Mantida para o Garimpeiro de motores novos)
+# 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
 
-# 3. 🏁 BANCO DE DADOS DE CAMINHOS CURTOS REAIS E LINKADOS DE FÁBRICA
+# 3. 🏁 BANCO DE DADOS DE CAMINHOS CURTOS (Memória de Bancada)
 caminhos_curtos = {
     "Chevrolet_Astra_2.0 8V Familia 2": {
-        "diagramas": [
-            {"title": "Esquema Técnico Completo de Distribuição - Astra 2.0 8V", "url": "https://oficinabrasil.com.br"},
-            {"title": "Pontos de Sincronismo Ilustrados - Família 2 Chevrolet", "url": "https://manualdomecanico.com.br"}
-        ],
-        "manuais": [
-            {"title": "Manual de Oficina Mecânica Astra G (Apostila de Engenharia Chevrolet)", "url": "https://manualdomecanico.com.br"}
-        ],
-        "foruns": [
-            {"title": "Fórum Oficina Brasil: Como ajustar o rolete tensionador do Astra 2.0 Flex Flex Flex", "url": "https://oficinabrasil.com.brforum"}
-        ],
-        "videos": [
-            {"title": "Vídeo Aula: Ponto da Correia Dentada Motor Astra / Vectra 2.0 8V", "url": "https://youtube.com"}
-        ]
+        "diagramas": [{"title": "Esquema Técnico de Distribuição - Astra 2.0 8V", "url": "https://manualdomecanico.com.br"}],
+        "manuais": [{"title": "Manual de Oficina Completo - Astra / Vectra PDF", "url": "https://manualdomecanico.com.br"}],
+        "foruns": [{"title": "Fórum Oficina Brasil: Macete do Tensionador Astra Flex", "url": "https://oficinabrasil.com.br"}],
+        "videos": [{"title": "Vídeo Passo a Passo Sincronismo Astra 2.0 8V", "url": "https://youtube.com"}]
     },
     "Volkswagen_Gol_1.0 3cil EA211": {
-        "diagramas": [
-            {"title": "Diagrama de Sincronismo e Engrenagem Trioval - Motor EA211 3 Cilindros", "url": "https://manualdomecanico.com.br"}
-        ],
-        "manuais": [
-            {"title": "Apostila Completa de Treinamento Técnico Oficial VW: Motores EA211 PDF", "url": "https://manualdomecanico.com.br"}
-        ],
-        "foruns": [
-            {"title": "Reparador Automotivo: Sincronismo EA211 e o perigo de montar fora de ponto", "url": "https://oficinabrasil.com.brforum"}
-        ],
-        "videos": [
-            {"title": "Procedimento Técnico: Troca da Correia Dentada EA211 3cil - Revista O Mecânico", "url": "https://youtube.com"}
-        ]
+        "diagramas": [{"title": "Diagrama de Sincronismo Trioval - Motor EA211 3 Cilindros", "url": "https://manualdomecanico.com.br"}],
+        "manuais": [{"title": "Apostila de Treinamento Técnico VW: Motores EA211 PDF", "url": "https://manualdomecanico.com.br"}],
+        "foruns": [{"title": "Reparador VW: Sincronismo EA211 sem ferramenta", "url": "https://oficinabrasil.com.br"}],
+        "videos": [{"title": "Troca da Correia Dentada EA211 3cil - O Mecânico", "url": "https://youtube.com"}]
     }
 }
 
-# 4. BANCO DE DADOS DE VEÍCULOS (Filtro em cascata limpo)
+# 4. BANCO DE DADOS DE VEÍCULOS
 dados_veiculos = {
     "Chevrolet": {
         "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2", "2.0 16V Familia 2"],
@@ -102,53 +85,76 @@ tipo_material = st.sidebar.radio(
     ["Sincronismo do Motor (Pontos e Marcas)", "Esquema de Passagem da Correia Poly-V"]
 )
 
-# Chave única para identificar o veículo na memória de caminhos curtos
 chave_memoria = f"{fabricante_selecionada}_{veiculo_selecionado}_{motor_selecionado}"
 
 st.info(f"⚙️ **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
 botao_buscar = st.button("⚡ DAR A PARTIDA NO GARIMPO", use_container_width=True)
 
-# 6. PROCESSAMENTO PLANO E BLINDADO ANTI-TRADUTOR
+# 6. PROCESSAMENTO
 if botao_buscar:
-    e_astra = (fabricante_selecionada == "Chevrolet" and veiculo_selecionado == "Astra" and "2.0 8v" in motor_selecionado.lower())
-    e_gol_ea211 = (fabricante_selecionada == "Volkswagen" and veiculo_selecionado == "Gol" and "ea211" in motor_selecionado.lower())
-    
-    # Frase de busca limpa e desobstruída para a web (Corrigida sem barras invertidas quebradas)
-    exclusoes = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
-    comando_pesquisa = f"sincronismo motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual oficina esquema pontos {exclusoes}"
-    
-    # Inicializa as Abas
-    aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
-        "📚 1. Manuais e PDFs", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
-    ])
-    
-    # 🏁 FLUXO 1: ENTREGA DOS CAMINHOS CURTOS GRAVADOS DE FÁBRICA (Astra e Gol)
-    if e_astra:
-        aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Manual de Oficina Completo Astra / Vectra</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Clique para abrir no Manual do Mecânico</a></div>', unsafe_allow_html=True)
-        aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Apostila Técnica Motor GM Família 2 PDF</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Baixar Arquivo Técnico Grátis</a></div>', unsafe_allow_html=True)
-        aba_img.markdown('<div class="card-tecnico"><h4>🖼️ Diagrama do Ponto de Sincronismo Astra 2.0 8V</h4><a href="https://oficinabrasil.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Ver Foto das Marcas de Referência</a></div>', unsafe_allow_html=True)
-        aba_forum.markdown('<div class="card-tecnico"><h4>💬 Fórum Oficina Brasil: Macete do Tensionador Astra Flex</h4><a href="https://oficinabrasil.com.brforum" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Ler Solução da Comunidade</a></div>', unsafe_allow_html=True)
-        aba_video.video("https://youtube.comwatch?v=dQw4w9WgXcQ")
+    # FLUXO 1: ENTREGA DOS CAMINHOS CURTOS GRAVADOS DE FÁBRICA
+    if chave_memoria in caminhos_curtos:
+        st.success("🏁 MEMÓRIA DE BANCADA ATIVA! Entregando caminhos curtos armazenados.")
+        dados_fixos = caminhos_curtos[chave_memoria]
         
-    elif e_gol_ea211:
-        aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Treinamento Técnico Oficial VW: Motor EA211 3cil</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Abrir Manual de Sincronismo</a></div>', unsafe_allow_html=True)
-        aba_img.markdown('<div class="card-tecnico"><h4>🖼️ Esquema das Ferramentas e Polia Trioval EA211</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Ver Imagem de Engenharia</a></div>', unsafe_allow_html=True)
-        aba_forum.markdown('<div class="card-tecnico"><h4>💬 Reparador VW: Ponto do EA211 sem ferramenta empena válvula?</h4><a href="https://oficinabrasil.com.brforum" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Ver Dica do Fórum</a></div>', unsafe_allow_html=True)
-        aba_video.markdown('🎥 **Vídeo Prático: Troca de Correia EA211 3 cilindros**')
-        aba_video.markdown('[🔗 Assistir no YouTube](https://youtube.com)')
+        aba_diag, aba_pdf, aba_forum, aba_video = st.tabs([
+            "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
+        ])
+        
+        for x in dados_fixos["diagramas"]:
+            aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {x["title"]}</h4><a href="{x["url"]}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Abrir Caminho do Diagrama</a></div>', unsafe_allow_html=True)
+        for x in dados_fixos["manuais"]:
+            aba_pdf.markdown(f'<div class="card-tecnico"><h4>📚 {x["title"]}</h4><a href="{x["url"]}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Abrir Manual Técnico / PDF</a></div>', unsafe_allow_html=True)
+        for x in dados_fixos["foruns"]:
+            aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {x["title"]}</h4><a href="{x["url"]}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Entrar no Fórum Mecânico</a></div>', unsafe_allow_html=True)
+        for x in dados_fixos["videos"]:
+            aba_video.markdown(f"#### 🎥 {x['title']}")
+            if "youtube" in x["url"].lower(): aba_video.video(x["url"])
+            else: aba_video.markdown(f'[🔗 Assistir Vídeo]({x["url"]})')
 
-    # ⛏️ FLUXO 2: SE FOR UM CARRO NOVO FORA DA MEMÓRIA, ACIONA O GARIMPEIRO NA WEB
+    # ⛏️ FLUXO 2: SE FOR UM CARRO NOVO FORA DA MEMÓRIA
     else:
-        with st.spinner("🤖 Carro novo! Garimpando rotas abertas..."):
+        with st.spinner("🤖 Graxinim abrindo as comportas de busca da web..."):
+            # Frase de busca ampliada e destrancada para trazer muitos achados técnicos
+            exclusoes = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
+            comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual tecnico pontos esquema {exclusoes}"
+            
             try:
-                # 🚨 AJUSTE DA URL E ATIVAÇÃO DO DOWNLOAD DE MINIATURAS VISUAIS 🚨
-                resposta_ia = requests.post("https://tavily.com", json={"api_key": TAVILY_API_KEY, "query": comando_pesquisa, "search_depth": "advanced", "max_results": 15, "include_images": True}).json()
+                resposta_ia = requests.post("https://tavily.com", json={"api_key": TAVILY_API_KEY, "query": comando_pesquisa, "search_depth": "advanced", "max_results": 20, "include_images": True}).json()
                 resultados = resposta_ia.get("results", [])
                 images = resposta_ia.get("images", [])
             except:
                 resultados, images = [], []
 
             if not resultados:
-                st.error("❌ Nenhuma rota limpa foi localizada pelo Garimpeiro para este motor novo. Tente termos aproximados.")
-            
-            # 🚨 INJEÇÃO INDEPENDENTE PLANA CORRIGIDA (Substituído r.get("url") e r.get("title") corretos) 🚨
+                st.error("❌ Nenhuma rota limpa foi localizada pelo Garimpeiro para este motor novo.")
+            else:
+                aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
+                    "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
+                ])
+                
+                # 🚨 NOVA CENTRAL DE DISTRIBUIÇÃO ELETRÔNICA DE LINKS (TRIAGEM CIRÚRGICA) 🚨
+                for r in resultados:
+                    url = r.get("url", "")
+                    url_l = url.lower()
+                    title = r.get("title", "Literatura Técnica")
+                    title_l = title.lower()
+                    
+                    # Ignora cartilhas de condutor comuns
+                    if any(t in title_l for t in ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]):
+                        continue
+                        
+                    # Gaveta 1: Vídeos Práticos
+                    if any(p in url_l for p in ["youtube.com", "youtu.be", "tiktok.com", "instagram.com"]):
+                        aba_video.markdown(f'#### 🎥 {title}\n[🔗 Assistir Vídeo]({url})\n---')
+                    
+                    # Gaveta 2: Arquivos de Manuais Densos e PDFs
+                    elif url_l.endswith(".pdf") or "pdf" in title_l or "manual-de" in url_l:
+                        aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📄 {title}</h4><a href="{url}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Abrir Manual Completo / PDF</a></div>', unsafe_allow_html=True)
+                    
+                    # Gaveta 3: Fóruns de Mecânicos e Discussões reais de Oficina
+                    elif any(f in url_l for f in ["forum", "club", "clube", "topico", "oficina-brasil", "reparador"]):
+                        aba_forum.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">💬 {title}</h4><a href="{url}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Acessar Fórum Automotivo</a></div>', unsafe_allow_html=True)
+                    
+                    # Gaveta 4: Esquemas Isolados e Diagramas Brutos
+                    else:
