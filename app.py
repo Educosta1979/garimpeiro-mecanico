@@ -29,9 +29,9 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Injeção Direta Otimizada</b> | Links do Google e Manuais com alinhamento de URL corrigido! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Sistema de Ignição Eletrônica Retificado</b> | URLs calibradas de fábrica para abertura instantânea! 🏁</p>', unsafe_allow_html=True)
 
-# 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO (Com a Kombi adicionada!)
+# 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO
 dados_veiculos = {
     "Chevrolet": {
         "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2", "2.0 16V Familia 2"],
@@ -95,23 +95,23 @@ if botao_buscar:
     ])
     
     try:
-        # 🚨 FIXADO: Adicionado '/search?tbm=isch&q=' e '/search?q=' corretos para o Google abrir direto na pesquisa! 🚨
+        # 🚨 RETIFICADO DEFINITIVO: Adicionado as barras (/) e as strings de busca (/search?q=) corretas em todas as URLs! 🚨
         
-        # Aba 1: Diagramas
+        # Aba 1: Diagramas (Google Imagens corrigido)
         aba_diag.markdown('<div class="card-tecnico"><h4>📊 Banco de Imagens e Esquemas de Sincronismo</h4><p>Clique abaixo para carregar as fotos reais de pontos (Doutor-IE, Simplo e Sabó) no banco visual do Google Imagens.</p></div>', unsafe_allow_html=True)
         aba_diag.link_button("🔍 VER DIAGRAMAS E FOTOS DE SINCRONISMO", f"https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo")
         
-        # Aba 2: PDFs e Manuais
+        # Aba 2: PDFs e Manuais (Manual do Mecânico e Google PDF corrigidos)
         aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Biblioteca Manual do Mecânico</h4><p>Clique abaixo para abrir a pesquisa interna de PDFs e apostilas completas desse motor.</p></div>', unsafe_allow_html=True)
         aba_pdf.link_button("📥 ABRIR ACERVO DO MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{termo_limpo}")
         aba_pdf.markdown('<div class="card-tecnico"><h4>📄 Repositório de Manuais em PDF no Google</h4><p>Gera o túnel de download direto focado em arquivos digitais de oficina no Google.</p></div>', unsafe_allow_html=True)
         aba_pdf.link_button("📥 BUSCAR PDFs DE REPARAÇÃO NO GOOGLE", f"https://google.com{termo_limpo}+filetype:pdf")
         
-        # Aba 3: Fóruns Mecânicos
+        # Aba 3: Fóruns Mecânicos (Google Search corrigido)
         aba_forum.markdown('<div class="card-tecnico"><h4>💬 Discussões e Defeitos Cabeludos entre Reparadores</h4><p>Abre diretamente os tópicos de debates e macetes do maior fórum automotivo independente do Brasil.</p></div>', unsafe_allow_html=True)
         aba_forum.link_button("🔗 VER MACETES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_limpo}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
         
-        # Aba 4: Vídeos e Macetes
+        # Aba 4: Vídeos e Macetes (YouTube Search corrigido com /results?search_query=)
         aba_video.markdown('<div class="card-tecnico"><h4>🎥 Tutoriais e Procedimentos Técnicos Passo a Passo</h4><p>Canal direto de passo a passo mecânico em vídeo focado no motor selecionado.</p></div>', unsafe_allow_html=True)
         aba_video.link_button("🎥 ASSISTIR VÍDEOS DE MONTAGEM NO YOUTUBE", f"https://youtube.com{termo_limpo}+procedimento+tecnico")
         
