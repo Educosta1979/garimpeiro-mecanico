@@ -18,10 +18,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # APRESENTAÇÃO DO NOVO CHEFE DA OFICINA
-col_logo, col_texto_topo = st.columns([1, 4])
-col_logo.image("https://wikimedia.org", width=110, caption="Graxinim Chefe 🦝")
-col_texto_topo.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim de boné e macacão cheio de graxa ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
+st.image("https://wikimedia.org", width=110, caption="Graxinim Chefe 🦝")
+st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -134,10 +133,8 @@ exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalo
 
 comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos forum youtube {exclusoes_ajustadas}"
 
-# Painel Central de Informações
-col_info, col_btn = st.columns(2)
-col_info.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-botao_buscar = col_btn.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
+st.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
+botao_buscar = st.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
 
 # 6. PROCESSAMENTO
 if botao_buscar:
@@ -146,7 +143,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=20,
+                max_results=12,
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -158,31 +155,29 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
         else:
-            # 🚨 SISTEMA ANTI-TRADUTOR: Código plano sem estruturas complexas 'with' nas abas 🚨
+            # 🚨 DESIGN RETIFICADO: Sem loops complexos nas abas. Tudo plano e direto! 🚨
             aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
-                "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
+                "📚 Manuais em PDF", "🖼️ Fotos e Imagens", "💬 Fóruns Mecânicos", "🎥 Vídeos e Macetes", "🌐 Portais Gerais"
             ])
             
-            termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
-
-            for item in resultados:
-                link = item.get("url", "")
-                titulo = item.get("title", "")
+            # Preenche as abas injetando os dados de forma sequencial simples
+            for x in resultados:
+                url_baixa = x.get("url", "").lower()
+                tit_baixo = x.get("title", "")
                 
-                # Se for manual do proprietário com a caixa desmarcada, ignora totalmente
-                if not incluir_manual_proprietario and any(t in titulo.lower() for t in termos_bloqueados):
+                # Bloqueio de manuais de proprietário
+                if not incluir_manual_proprietario and any(t in tit_baixo.lower() for t in ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]):
                     continue
 
-                # Triagem direta por link e texto
-                if any(p in link.lower() for p in ["youtube", "youtu.be", "tiktok", "instagram", "kwai"]):
-                    aba_video.markdown(f"#### 🎥 {titulo}")
-                    if "youtube" in link.lower() or "youtu.be" in link.lower():
-                        aba_video.video(link)
-                    else:
-                        aba_video.markdown(f"🔗 **[Abrir Vídeo Original]({link})**")
+                if any(p in url_baixa for p in ["youtube", "youtu.be", "tiktok", "instagram"]):
+                    aba_video.markdown(f'#### 🎥 {tit_baixo}')
+                    aba_video.markdown(f'[🔗 Abrir Link do Vídeo]({x.get("url")})')
                     aba_video.write("---")
-                    
-                elif link.lower().endswith(".pdf") or "pdf" in titulo.lower():
-                    aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {titulo}</h4><a href="{link}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True)
-                    
-                elif any(f in link.lower() for f in ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]):
+                elif url_baixa.endswith(".pdf") or "pdf" in tit_baixo.lower():
+                    aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {tit_baixo}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir/Baixar PDF</a></div>', unsafe_allow_html=True)
+                elif any(f in url_baixa for f in ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]):
+                    aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {tit_baixo}</h4><a href="{x.get("url")}" target="_blank">🔗 Acessar Fórum</a></div>', unsafe_allow_html=True)
+                else:
+                    aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {tit_baixo}</h4><a href="{x.get("url")}" target="_blank">🔗 Abrir Link Geral</a></div>', unsafe_allow_html=True)
+
+            # Injeta as imagens na aba 2
