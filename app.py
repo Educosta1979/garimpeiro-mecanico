@@ -17,13 +17,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🚨 LINK DA FOTO DO MASCOTE ATUALIZADO PARA URL FIXA E CONFIÁVEL 🚨
-col_logo, col_texto_topo = st.columns([1, 5])
-with col_logo:
-    st.image("https://wikimedia.org", width=110, caption="Graxinim Chefe 🦝")
-with col_texto_topo:
-    st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim de boné e macacão cheio de graxa ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
+# APRESENTAÇÃO DO NOVO CHEFE DA OFICINA
+col_logo, col_texto_topo = st.columns([1, 4])
+col_logo.image("https://wikimedia.org", width=110, caption="Graxinim Chefe 🦝")
+col_texto_topo.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim de boné e macacão cheio de graxa ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -138,12 +136,8 @@ comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selec
 
 # Painel Central de Informações
 col_info, col_btn = st.columns(2)
-with col_info:
-    st.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-with col_btn:
-    st.write("")
-    st.write("")
-    botao_buscar = st.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
+col_info.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
+botao_buscar = col_btn.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
 
 # 6. PROCESSAMENTO
 if botao_buscar:
@@ -164,35 +158,31 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
         else:
-            lista_pdfs = []
-            lista_foruns = []
-            lista_videos = []
-            lista_portais = []
-            
-            plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram", "kwai", "video"]
-            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]
-            termos_bloqueados_manuais = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
-
-            for item in resultados:
-                link = item.get("url", "").lower()
-                titulo = item.get("title", "").lower()
-                
-                if not incluir_manual_proprietario and any(termo in titulo for termo in termos_bloqueados_manuais):
-                    continue
-
-                if any(p in link for p in plataformas_video) or "video" in titulo:
-                    lista_videos.append(item)
-                elif link.endswith(".pdf") or "pdf" in titulo:
-                    lista_pdfs.append(item)
-                elif any(f in link for f in sites_foruns) or any(f in titulo for f in sites_foruns):
-                    lista_foruns.append(item)
-                else:
-                    lista_portais.append(item)
-            
-            # 🚨 CORREÇÃO DEFINITIVA: Abas e loops reestruturados de forma linear sem o comando 'with' 🚨
+            # 🚨 SISTEMA ANTI-TRADUTOR: Código plano sem estruturas complexas 'with' nas abas 🚨
             aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
                 "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
             ])
             
-            # Injeta dados na Aba 1
-            if not lista_pdfs:
+            termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
+
+            for item in resultados:
+                link = item.get("url", "")
+                titulo = item.get("title", "")
+                
+                # Se for manual do proprietário com a caixa desmarcada, ignora totalmente
+                if not incluir_manual_proprietario and any(t in titulo.lower() for t in termos_bloqueados):
+                    continue
+
+                # Triagem direta por link e texto
+                if any(p in link.lower() for p in ["youtube", "youtu.be", "tiktok", "instagram", "kwai"]):
+                    aba_video.markdown(f"#### 🎥 {titulo}")
+                    if "youtube" in link.lower() or "youtu.be" in link.lower():
+                        aba_video.video(link)
+                    else:
+                        aba_video.markdown(f"🔗 **[Abrir Vídeo Original]({link})**")
+                    aba_video.write("---")
+                    
+                elif link.lower().endswith(".pdf") or "pdf" in titulo.lower():
+                    aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {titulo}</h4><a href="{link}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True)
+                    
+                elif any(f in link.lower() for f in ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]):
