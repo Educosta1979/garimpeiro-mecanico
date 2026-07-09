@@ -17,11 +17,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🚨 LOGO DO GRAXINIM ATUALIZADA COM ÍCONE DO SISTEMA (NUNCA QUEBRA!) 🚨
-col_logo, col_texto_topo = st.columns([1, 9])
+# LOGO DO GRAXINIM COM ÍCONE DO SISTEMA
+col_logo, col_texto_topo = st.columns()
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim Chefe - Buscando Doutor-IE, Simplo, Dicatec e Manuais do Mecânico! 🛠️🚘</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim Chefe - Buscando manuais e diagramas técnicos automotivos! 🛠️🚘</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -109,16 +109,12 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. ESTRUTURAÇÃO DO COMANDO TURBINADO (Injetando Doutor-IE, Simplo e o site enviado)
+# 5. MONTAGEM DO COMANDO (Calibrado e Otimizado para não falhar)
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
 
-# 🔥 LOGICA SECRETA: Força a busca a cruzar os dados do motor com as grandes enciclopédias técnicas e o site do print
-comando_pesquisa = (
-    f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} "
-    f"site:manualdomecanico.com.br OR \"doutor ie\" OR \"simplo\" OR \"dicatek\" OR \"mecanica 2000\" "
-    f"esquema pontos forum youtube {exclusoes_ajustadas}"
-)
+# Busca limpa e direta, garantindo que o servidor da IA encontre dados
+comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual mecânico esquema pontos"
 
 # Painel Central de Informações
 col_info, col_btn = st.columns(2)
@@ -132,7 +128,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=20,
+                max_results=25, # Aumentado para trazer o máximo de mídias possíveis
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -162,7 +158,7 @@ if botao_buscar:
 
                 if any(p in link.lower() for p in plataformas_video) or "video" in titulo.lower():
                     lista_videos.append(item)
-                elif link.lower().endswith(".pdf") or "pdf" in titulo.lower() or "manualdomecanico.com.br" in link.lower():
+                elif link.lower().endswith(".pdf") or "pdf" in titulo.lower() or "manualdomecanico" in link.lower():
                     lista_pdfs.append(item)
                 elif any(f in link.lower() for f in sites_foruns) or any(f in titulo.lower() for f in sites_foruns):
                     lista_foruns.append(item)
@@ -174,14 +170,20 @@ if botao_buscar:
                 "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
             ])
             
-            # Preenchimento da Aba 1 (PDF e site Manual do Mecânico)
+            # Injeta dados na Aba 1
             if not lista_pdfs:
-                aba_pdf.info("Nenhum arquivo PDF direto detectado.")
+                aba_pdf.info("Nenhum arquivo PDF direto detectado nesta pesquisa.")
             for item in lista_pdfs:
                 aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir Literatura Técnica / Download</a></div>', unsafe_allow_html=True)
 
-            # Preenchimento da Aba 2 (Imagens - Alinhadas sem quebra)
+            # Injeta dados na Aba 2 (Imagens - Puxa tudo o que encontrar sobre o motor)
             if not imagens_encontradas:
-                aba_img.info("Nenhuma imagem direta extraída. Tente abrir os links da aba de PDF ou Portais para ver as fotos internas.")
+                aba_img.info("A IA não extraiu fotos diretas isoladas. Verifique os manuais na Aba 1 ou Aba 5 que possuem fotos internas.")
             else:
-                aba_img.success(f"Encontramos {len(imagens_encontradas)} esquemas visuais coletados na internet:")
+                aba_img.success(f"Encontramos {len(imagens_encontradas)} diagramas e fotos na rede:")
+                for img_url in imagens_encontradas[:8]:
+                    aba_img.image(img_url, use_container_width=True)
+                    aba_img.write("---")
+
+            # Injeta dados na Aba 3 (Fóruns)
+            if not lista_foruns:
