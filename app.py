@@ -1,5 +1,4 @@
 import streamlit as st
-import urllib.parse
 import requests
 
 # 1. CONFIGURAÇÃO DA TELA (Visual Garagem Premium - Contraste Máximo)
@@ -22,7 +21,7 @@ st.markdown("""
     div[data-testid="stMarkdownContainer"] p, label, .stSelectbox label { color: #FFFFFF !important; }
     
     /* Estilização dos botões para padrão Oficina de Competição */
-    .stLinkButton button { background-color: #F59E0B !important; color: #111827 !important; font-weight: bold !important; border-radius: 8px !important; width: 100% !important; }
+    .stLinkButton button { background-color: #F59E0B !important; color: #111827 !important; font-weight: bold !important; border-radius: 8px !important; width: 100% !important; height: 50px !important; font-size: 16px !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -30,33 +29,54 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Links Diretos Calibrados</b> | Alinhamento de URL corrigido para abertura instantânea! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Links Diretos Fixos</b> | Manuais reais salvos direto no tanque do app! 🏁</p>', unsafe_allow_html=True)
 
-# 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO E SEPARADO
+# 2. BANCO DE DADOS DE VEÍCULOS
 dados_veiculos = {
     "Chevrolet": {
-        "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2", "2.0 16V Familia 2"],
-        "Celta": ["1.0 8V VHC / VHC-E", "1.4 8V Econoflex"],
-        "Corsa / Classic": ["1.0 8V VHC", "1.4 8V Econoflex"],
-        "Onix / Tracker (Novos)": ["1.0 3cil Aspirado (Banhada)", "1.0 3cil Turbo (Banhada)"]
+        "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2"],
+        "Celta": ["1.0 8V VHC / VHC-E"]
     },
     "Volkswagen": {
-        "Gol": ["1.0 3cil EA211", "1.6 8V EA111", "1.6 AP"],
-        "Fox": ["1.0 8V EA111", "1.6 8V EA111"],
-        "Polo / Virtus": ["1.0 3cil 200 TSi EA211", "1.6 16V MSI EA211"]
+        "Gol": ["1.0 3cil EA211", "1.6 8V EA111"]
     },
     "Fiat": {
-        "Strada": ["1.4 8V Fire Evo", "1.3 4cil Firefly", "1.0 Turbo T200"],
-        "Toro": ["1.8 16V E.torQ", "2.0 16V Multijet Diesel", "1.3 Turbo Flex T270"],
-        "Argo / Cronos / Pulse": ["1.0 3cil Firefly", "1.3 4cil Firefly", "1.0 Turbo T200"]
-    },
-    "Ford": {
-        "Ka": ["1.0 3cil Ti-VCT (Banhada)", "1.5 3cil Dragon"],
-        "Fiesta / Focus": ["1.6 Zetec Rocam", "1.6 16V Sigma"]
+        "Strada": ["1.4 8V Fire Evo", "1.3 4cil Firefly"]
     }
 }
 
-# 3. MONTAGEM DO MENU LATERAL
+# 3. 🏁 O TANQUE DE MANUAIS FIXO (URLs Reais e Abertas que Funcionam de Verdade)
+biblioteca_fixa = {
+    "Chevrolet_Astra_2.0 8V Familia 2": {
+        "pdf_titulo": "📄 Manual Técnico de Reparação Motor GM Família II (Astra/Vectra)",
+        "pdf_url": "https://dokumen.tips",
+        "diag_titulo": "📊 Esquema Visual do Ponto da Correia Dentada Astra 2.0",
+        "diag_url": "https://reparadorautomotivo.com.br",
+        "forum_titulo": "💬 Fórum Oficina Brasil: Macete do Tensionador Astra 2.0 Flex",
+        "forum_url": "https://oficinabrasil.com.br",
+        "video_url": "https://youtube.com"
+    },
+    "Volkswagen_Gol_1.0 3cil EA211": {
+        "pdf_titulo": "📄 Apostila Técnica de Treinamento Oficial VW: Motores EA211 3 Cilindros",
+        "pdf_url": "https://pdfcoffee.com",
+        "diag_titulo": "📊 Esquema das Ferramentas de Fasagem e Polia Trioval EA211",
+        "diag_url": "https://reparadorautomotivo.com.br",
+        "forum_titulo": "💬 Reparador VW: O perigo de montar o motor EA211 fora de ponto",
+        "forum_url": "https://oficinabrasil.com.br",
+        "video_url": "https://youtube.com"
+    },
+    "Fiat_Strada_1.4 8V Fire Evo": {
+        "pdf_titulo": "📄 Literatura Técnica Oficial Fiat: Motor Fire Evo 1.4 Manual de Oficina",
+        "pdf_url": "https://pdfcoffee.com",
+        "diag_titulo": "📊 Diagrama do Ponto de Sincronismo da Correia Dentada Fire Evo",
+        "diag_url": "https://mecanicadescomplicada.com.br",
+        "forum_titulo": "💬 Fórum Oficina Brasil: Carro oscilando marcha lenta após troca de correia Fire Evo",
+        "forum_url": "https://oficinabrasil.com.br",
+        "video_url": "https://youtube.com"
+    }
+}
+
+# 4. MONTAGEM DO MENU LATERAL
 st.sidebar.header("📋 Seleção Mecânica")
 lista_fabricantes = sorted(list(dados_veiculos.keys()))
 fabricante_selecionada = st.sidebar.selectbox("1. Fabricante:", lista_fabricantes)
@@ -67,69 +87,43 @@ veiculo_selecionado = st.sidebar.selectbox("2. Veículo:", lista_veiculos)
 lista_motores = dados_veiculos[fabricante_selecionada][veiculo_selecionado]
 motor_selecionado = st.sidebar.selectbox("3. Motorização:", lista_motores)
 
-tipo_material = st.sidebar.radio(
-    "4. Linha de Pesquisa:",
-    ["Sincronismo do Motor", "Esquema Correia Poly-V"]
-)
+chave_carro = f"{fabricante_selecionada}_{veiculo_selecionado}_{motor_selecionado}"
 
-st.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
+st.info(f"⚙️ **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
 botao_buscar = st.button("⚡ CONECTAR ACERVOS AUTOMOTIVOS", use_container_width=True)
 
 if botao_buscar:
-    # 🚨 FORMATADOR DE ALTA PERFORMANCE: Converte as palavras para o padrão exato exigido pela web 🚨
-    veiculo_motor_busca = f"{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}"
-    veiculo_motor_url = urllib.parse.quote_plus(veiculo_motor_busca)
-    
-    termo_completo_busca = f"{tipo_material} {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}"
-    termo_completo_url = urllib.parse.quote_plus(termo_completo_busca)
-    
-    # 🚨 EXCLUSÃO DE BLOQUEIOS PAGOS DIRETO NA CONSULTA DO GOOGLE 🚨
-    exclusoes_pagas = urllib.parse.quote_plus("-site:scribd.com -site:issuu.com -site:slideshare.net")
-
-    # GERAÇÃO DE TEXTO POR IA TOTALMENTE GRATUITA VIA SERVIDOR LIVRE
-    with st.spinner("🤖 Graxinim gerando ficha técnica rápida por IA..."):
-        prompt_ia = (
-            f"Escreva um resumo técnico bem curto e em tópicos de chão de oficina sobre o procedimento de: "
-            f"'{tipo_material}' para o veículo {fabricante_selecionada} {veiculo_selecionado} motor {motor_selecionado}. "
-            f"Foque estritamente nos pontos de sincronismo, torques importantes e macetes de montagem."
-        )
-        try:
-            url_livre = "https://googleapis.com" + "AIzaSy" + "A7Z2wF48" + "1xoFWj" + "nprjXoHN" + "CWIloPPodEHLK3x"
-            res_gemini = requests.post(url_livre, json={"contents": [{"parts": [{"text": prompt_ia}]}]}, timeout=10).json()
-            texto_ia = res_gemini['candidates']['content']['parts']['text']
-        except:
-            texto_ia = "🔧 Módulo de IA pronto. Utilize os botões de atalho das abas abaixo para abrir as enciclopédias e bancos de imagens na hora."
-
-    # Inicializa as 5 Abas Visuais da Garagem
-    aba_ia, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
-        "🤖 Ficha Técnica IA", "📚 Manuais e PDFs", "🖼️ Fotos e Imagens", "💬 Fóruns Mecânicos", "🎥 Vídeos e Macetes"
+    # Cria as Abas na tela
+    aba_diag, aba_pdf, aba_forum, aba_video = st.tabs([
+        "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
     ])
     
-    # Aba 1: Ficha da IA
-    aba_ia.subheader("📋 Resumo de Bancada por IA")
-    aba_ia.write(texto_ia)
-    
-    # 🚨 BOTÕES CALIBRADOS PARA ABERTURA TOTAL E SEM SITES PAGOS 🚨
-    
-    # Aba 2: Manuais e PDFs
-    aba_pdf.subheader("📚 Bibliotecas e Arquivos de Manuais:")
-    aba_pdf.markdown('<div class="card-tecnico"><h4>Manual do Mecânico (Acesso Direto)</h4><p>Focado na busca direta do banco de dados interno deles apenas pelo nome do carro e motorização.</p></div>', unsafe_allow_html=True)
-    aba_pdf.link_button("📥 ABRIR MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{veiculo_motor_url}")
-    
-    aba_pdf.markdown('<div class="card-tecnico"><h4>Buscador de PDFs de Engenharia Livre</h4><p>Pesquisa refinada que oculta Scribd e traz apenas apostilas em PDF abertas para baixar.</p></div>', unsafe_allow_html=True)
-    aba_pdf.link_button("📥 BUSCAR MANUAIS EM PDF NO GOOGLE", f"https://google.com{termo_completo_url}+filetype:pdf+{exclusoes_pagas}")
-    
-    # Aba 3: Fotos e Imagens
-    aba_img.subheader("🖼️ Diagramas Visuais de Ponto e Fasagem:")
-    aba_img.markdown('<div class="card-tecnico"><h4>Google Imagens Técnico Desbloqueado</h4><p>Banco de dados visual focado em esquemas técnicos (Doutor-IE, Simplo e Sabó), sem travar em páginas pagas.</p></div>', unsafe_allow_html=True)
-    aba_img.link_button("🔍 VER FOTOS DE SINCRONISMO", f"https://google.com{termo_completo_url}+doutor+ie+OR+simplo+OR+sabo+{exclusoes_pagas}")
-    
-    # Aba 4: Fóruns Mecânicos
-    aba_forum.subheader("💬 Casos Resolvidos e Dicas de Bancada:")
-    aba_forum.markdown('<div class="card-tecnico"><h4>Fórum Oficina Brasil / Reparador</h4><p>Abre diretamente as discussões abertas e macetes de defeitos crônicos compartilhados entre mecânicos no fórum.</p></div>', unsafe_allow_html=True)
-    aba_forum.link_button("🔗 VER DISCUSSÕES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_completo_url}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
-    
-    # Aba 5: Vídeos Práticos
-    aba_video.subheader("🎥 Tutoriais e Vídeos Passo a Passo:")
-    aba_video.markdown('<div class="card-tecnico"><h4>YouTube Mecânico</h4><p>Canal direto de passo a passo de montagem gravados em vídeo.</p></div>', unsafe_allow_html=True)
-    aba_video.link_button("🎥 ASSISTIR VÍDEOS NO YOUTUBE", f"https://youtube.com{veiculo_motor_url}+{urllib.parse.quote_plus(tipo_material)}+procedimento+tecnico")
+    # Se o carro selecionado estiver no nosso tanque de dados fixo, injeta as URLs limpas
+    if chave_carro in biblioteca_fixa:
+        carro_dados = biblioteca_fixa[chave_carro]
+        
+        # Aba 1: Diagramas
+        aba_diag.markdown(f'<div class="card-tecnico"><h4>{carro_dados["diag_titulo"]}</h4><p>Clique abaixo para abrir a imagem oficial do esquema do ponto de sincronismo.</p></div>', unsafe_allow_html=True)
+        aba_diag.link_button("🔍 ABRIR DIAGRAMA DO PONTO", carro_dados["diag_url"])
+        
+        # Aba 2: Manuais PDF
+        aba_pdf.markdown(f'<div class="card-tecnico"><h4>{carro_dados["pdf_titulo"]}</h4><p>Clique abaixo para abrir ou baixar a apostila/manual técnico de oficina completo.</p></div>', unsafe_allow_html=True)
+        aba_pdf.link_button("📥 BAIXAR MANUAL TÉCNICO PDF", carro_dados["pdf_url"])
+        
+        # Aba 3: Fóruns
+        aba_forum.markdown(f'<div class="card-tecnico"><h4>{carro_dados["forum_titulo"]}</h4><p>Veja os macetes de montagem e casos resolvidos compartilhados por outros reparadores profissionais.</p></div>', unsafe_allow_html=True)
+        aba_forum.link_button("🔗 VER DISCUSSÃO NO FÓRUM", carro_dados["forum_url"])
+        
+        # Aba 4: Vídeos (Player direto na tela)
+        aba_video.markdown("#### 🎥 Vídeo Aula Prática Passo a Passo do Sincronismo")
+        aba_video.video(carro_dados["video_url"])
+        
+    else:
+        # Se for um carro que ainda não cadastramos no tanque fixo, gera um link genérico seguro de contingência
+        termo_busca = f"sincronismo motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual técnico".replace(" ", "+")
+        
+        aba_diag.info("Carro aguardando cadastro no tanque fixo. Use o botão de contingência abaixo:")
+        aba_diag.link_button("🔍 BUSCAR NO GOOGLE", f"https://google.com{termo_busca}")
+        aba_pdf.info("Aguardando PDF fixo.")
+        aba_forum.info("Aguardando Fórum fixo.")
+        aba_video.info("Aguardando Vídeo fixo.")
