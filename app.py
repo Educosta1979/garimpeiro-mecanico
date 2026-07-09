@@ -25,7 +25,7 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 90px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Literatura Mecânica de Precisão</b> | Analisando Doutor-IE, Simplo e Fóruns Técnicos sem enrolação eletrônica! 🔧🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>O Primeiro Software Feito para Chão de Oficina</b> | Filtros limpos estilo Doutor-IE e Simplo sem enrolação comercial! 🔧🏁</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -88,13 +88,15 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DO COMANDO
+# 5. MONTAGEM DO COMANDO (Injeção Eletrônica Calibrada)
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
-exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
+
+# Adicionado filtros negativos pesados na frase de busca para banir de vez sites institucionais ou de autopeças comerciais
+exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo -pecas -loja -produto"
 
 comando_pesquisa = (
-    f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} "
-    f"manual oficina diagramas esquema \"oficina brasil\" OR \"reparador\" OR \"resolvido\" OR \"defeito\" {exclusoes_ajustadas}"
+    f'"{tipo_material}" motor "{motor_selecionado}" "{fabricante_selecionada} {veiculo_selecionado}" {texto_ano} '
+    f'"ponto de sincronismo" OR "esquema técnico" OR "tabela de torque" {exclusoes_ajustadas}'
 )
 
 # Painel Central de Informações
@@ -104,7 +106,7 @@ botao_buscar = col_btn.button("⚡ DAR A PARTIDA NO GARIMPO", use_container_widt
 
 # 6. PROCESSAMENTO
 if botao_buscar:
-    with st.spinner("🤖 Graxinim vasculhando as bancadas da internet..."):
+    with st.spinner("🤖 Graxinim destrinchando os acervos automotivos..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
@@ -127,21 +129,24 @@ if botao_buscar:
             lista_videos = []
             
             plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram"]
-            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "topico"]
+            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "topico", "comunidade"]
             termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
 
             for item in resultados:
                 link = item.get("url", "")
                 titulo = item.get("title", "")
+                link_min = link.lower()
+                tit_min = titulo.lower()
                 
-                if not incluir_manual_proprietario and any(t in titulo.lower() for t in termos_bloqueados):
+                if not incluir_manual_proprietario and any(t in tit_min for t in termos_bloqueados):
                     continue
 
-                if any(p in link.lower() for p in plataformas_video):
+                if any(p in link_min for p in plataformas_video):
                     lista_videos.append(item)
-                elif any(f in link.lower() for f in sites_foruns) or any(f in titulo.lower() for f in sites_foruns):
+                elif any(f in link_min for f in sites_foruns) or any(f in tit_min for f in sites_foruns):
                     lista_foruns.append(item)
-                elif any(d in titulo.lower() or d in link.lower() for d in ["diagrama", "esquema", "ponto", "sincronismo", "imagem", "foto"]):
+                # 🚨 PENTE FINO RECALIBRADO: Só entra na aba de Diagramas se o título contiver palavras fortes de IMAGEM ou ESQUEMA BRUTO
+                elif any(d in tit_min or d in link_min for d in ["diagrama", "esquema visual", "ponto de sincronismo", "imagem", "foto", "png", "jpg"]):
                     lista_diagramas.append(item)
                 else:
                     lista_manuais.append(item)
@@ -151,25 +156,23 @@ if botao_buscar:
                 "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
             ])
             
-            # 🚨 INJEÇÃO COMPACTADA INDEPENDENTE: Sem loops 'for' com indentação interna. Totalmente imune a tradutores! 🚨
+            # Injeta dados de forma limpa e sequencial (Anti-Tradutor)
             if not lista_diagramas: aba_diag.info("Nenhum diagrama rápido isolado detectado.")
-            [aba_diag.markdown(f'<div class="card-tecnico"><h4>📊 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">🔍 Abrir Esquema Visual</a></div>', unsafe_allow_html=True) for x in lista_diagramas]
+            [aba_diag.markdown(f'<div class="card-tecnico"><h4>📊 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True) for x in lista_diagramas]
 
             if not lista_manuais: aba_pdf.info("Nenhum manual de oficina completo listado.")
-            [aba_pdf.markdown(f'<div class="card-tecnico"><h4>📚 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir Manual Técnico / PDF</a></div>', unsafe_allow_html=True) for x in lista_manuais]
+            [aba_pdf.markdown(f'<div class="card-tecnico"><h4>📚 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True) for x in lista_manuais]
 
+            # Filtro das Fotos Miniaturas
             termos_mecanicos = ["motor", "sincronismo", "correia", "corrente", "torque", "car", "auto", "mecanic", "astra", "chevrolet", "valvula", "passagem", "poly", "tensionador", "polia"]
             imagens_filtradas = [img for img in imagens_encontradas if any(t in img.lower() for t in termos_mecanicos)]
             if not imagens_filtradas: aba_img.info("Nenhuma miniatura de imagem técnica extraída.")
             [aba_img.image(url_foto, use_container_width=True) for url_foto in imagens_filtradas[:6]]
 
-            if not lista_foruns: aba_forum.info("Nenhum debate de fórum localizado.")
-            [aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">🔗 Entrar no Tópico do Fórum</a></div>', unsafe_allow_html=True) for x in lista_foruns]
+            if not lista_foruns: aba_forum.info("Nenhum debate de fórum localizado. Tente buscar na aba de Manuais ou Vídeos.")
+            [aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">🔗 Entrar no Tópico do Fórum Mecânico</a></div>', unsafe_allow_html=True) for x in lista_foruns]
 
             if not lista_videos: aba_video.info("Nenhum vídeo listado.")
             for item in lista_videos:
                 aba_video.markdown(f"#### 🎥 {item.get('title')}")
                 url_vid = item.get('url')
-                if "youtube" in url_vid or "youtu.be" in url_vid: aba_video.video(url_vid)
-                else: aba_video.markdown(f"🔗 **[Assistir Vídeo na Plataforma]({url_vid})**")
-                aba_video.write("---")
