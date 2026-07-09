@@ -17,7 +17,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">⚙️ Central de Literatura Técnico Automotiva</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Garimpo Visual de Diagramas, Pontos de Sincronismo e Manuais de Engenharia</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
@@ -126,12 +126,12 @@ st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
 # 5. ESTRUTURAÇÃO DO COMANDO RESTRITO ANTI-PAGAMENTO
-# Bloqueio radical do Scribd, Issuu e e-commerces para proteger o tempo do mecânico
 exclusoes_rigidas = (
     "-scribd -issuu -slideshare -mercadolivre -olx -shopee -aliexpress "
     "-comprar -preco -venda -catalogo -login -sign -facebook"
 )
 
+# 🚨 LINHA CORRIGIDA COM O RECUO DE ESPAÇOS CORRETO PARA RODAR 🚨
 if not incluir_manual_proprietario:
     exclusoes_rigidas += ' -"proprietario" -"usuario" -"condutor" -"owner"'
 
@@ -139,7 +139,6 @@ outras_marcas = [marca for marca in lista_fabricantes if marca != fabricante_sel
 for marca in outras_marcas:
     exclusoes_rigidas += f" -{marca.lower()}"
 
-# Modificado para solicitar esquemas de imagens com descrição
 comando_pesquisa = f'"{tipo_material}" "{fabricante_selecionada} {veiculo_selecionado}" motor "{motor_selecionado}" {ano_selecionado} "esquema" OR "pontos" {exclusoes_rigidas}'
 
 # Painel Central de Informações
@@ -159,7 +158,7 @@ if botao_buscar:
                 query=comando_pesquisa,
                 search_depth="advanced",
                 max_results=10,
-                include_images=True # 🚨 ATIVAÇÃO DO MOTOR DE IMAGENS DA IA 🚨
+                include_images=True
             )
             resultados = resposta_ia.get("results", [])
             imagens_encontradas = resposta_ia.get("images", [])
@@ -180,3 +179,6 @@ if botao_buscar:
                 resumo = item.get("content", "")
                 
                 if not incluir_manual_proprietario:
+                    if any(p in titulo.lower() or p in resumo.lower() for p in ["proprietario", "usuario", "condutor", "owner"]):
+                        continue
+                
