@@ -109,12 +109,11 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DO COMANDO (Calibrado e Otimizado para não falhar)
+# 5. MONTAGEM DO COMANDO
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
 
-# Busca limpa e direta, garantindo que o servidor da IA encontre dados
-comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual mecânico esquema pontos"
+comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos"
 
 # Painel Central de Informações
 col_info, col_btn = st.columns(2)
@@ -128,7 +127,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=25, # Aumentado para trazer o máximo de mídias possíveis
+                max_results=20,
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -140,50 +139,34 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
         else:
-            lista_pdfs = []
-            lista_foruns = []
-            lista_videos = []
-            lista_portais = []
+            # 🚨 SISTEMA RETIFICADO 100% PLANO: Abas independentes sem validações internas de recuo 🚨
+            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
+                "📚 Manuais em PDF", "🖼️ Fotos e Imagens", "💬 Fóruns Mecânicos", "🎥 Vídeos e Macetes", "🌐 Portais Gerais"
+            ])
             
-            plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram", "kwai", "video"]
-            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "injetronic"]
-            termos_bloqueados_manuais = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
+            termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
 
+            # Processamento linear e sequencial limpo
             for item in resultados:
                 link = item.get("url", "")
                 titulo = item.get("title", "")
+                link_min = link.lower()
+                tit_min = titulo.lower()
                 
-                if not incluir_manual_proprietario and any(termo in titulo.lower() for termo in termos_bloqueados_manuais):
+                if not incluir_manual_proprietario and any(t in tit_min for t in termos_bloqueados):
                     continue
 
-                if any(p in link.lower() for p in plataformas_video) or "video" in titulo.lower():
-                    lista_videos.append(item)
-                elif link.lower().endswith(".pdf") or "pdf" in titulo.lower() or "manualdomecanico" in link.lower():
-                    lista_pdfs.append(item)
-                elif any(f in link.lower() for f in sites_foruns) or any(f in titulo.lower() for f in sites_foruns):
-                    lista_foruns.append(item)
+                if any(p in link_min for p in ["youtube", "youtu.be", "tiktok", "instagram"]):
+                    aba_video.markdown(f"#### 🎥 {titulo}")
+                    aba_video.markdown(f"[🔗 Abrir Link do Vídeo]({link})")
+                    aba_video.write("---")
+                elif link_min.endswith(".pdf") or "pdf" in tit_min:
+                    aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {titulo}</h4><a href="{link}" target="_blank">📥 Abrir/Baixar PDF</a></div>', unsafe_allow_html=True)
+                elif any(f in link_min for f in ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]):
+                    aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {titulo}</h4><a href="{link}" target="_blank">🔗 Acessar Fórum</a></div>', unsafe_allow_html=True)
                 else:
-                    lista_portais.append(item)
-            
-            # Abas principais
-            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
-                "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
-            ])
-            
-            # Injeta dados na Aba 1
-            if not lista_pdfs:
-                aba_pdf.info("Nenhum arquivo PDF direto detectado nesta pesquisa.")
-            for item in lista_pdfs:
-                aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir Literatura Técnica / Download</a></div>', unsafe_allow_html=True)
+                    aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {titulo}</h4><a href="{link}" target="_blank">🔗 Abrir Link Geral</a></div>', unsafe_allow_html=True)
 
-            # Injeta dados na Aba 2 (Imagens - Puxa tudo o que encontrar sobre o motor)
-            if not imagens_encontradas:
-                aba_img.info("A IA não extraiu fotos diretas isoladas. Verifique os manuais na Aba 1 ou Aba 5 que possuem fotos internas.")
-            else:
-                aba_img.success(f"Encontramos {len(imagens_encontradas)} diagramas e fotos na rede:")
-                for img_url in imagens_encontradas[:8]:
-                    aba_img.image(img_url, use_container_width=True)
-                    aba_img.write("---")
-
-            # Injeta dados na Aba 3 (Fóruns)
-            if not lista_foruns:
+            # Envio direto das fotos encontradas para a aba 2
+            for img_url in imagens_encontradas[:6]:
+                aba_img.image(img_url, use_container_width=True)
