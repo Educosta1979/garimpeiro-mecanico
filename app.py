@@ -17,11 +17,10 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🚨 APRESENTAÇÃO DO NOVO CHEFE DA OFICINA: O MASCOTE GRAXINIM 🚨
-col_logo, col_texto_topo = st.columns([1, 4])
+# 🚨 LINK DA FOTO DO MASCOTE ATUALIZADO PARA URL FIXA E CONFIÁVEL 🚨
+col_logo, col_texto_topo = st.columns([1, 5])
 with col_logo:
-    # Usando uma imagem ilustrativa temporária de Guaxinim Mecânico via URL pública estável
-    st.image("https://unsplash.com", width=120, caption="Graxinim Chefe 🦝")
+    st.image("https://wikimedia.org", width=110, caption="Graxinim Chefe 🦝")
 with col_texto_topo:
     st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim de boné e macacão cheio de graxa ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
@@ -190,9 +189,10 @@ if botao_buscar:
                 else:
                     lista_portais.append(item)
             
-            # 🚨 ABAS SOLICITADAS: Isoladas de forma linear, 100% protegidas contra recuos fantasmas do tradutor 🚨
-            abas = st.tabs([
+            # 🚨 CORREÇÃO DEFINITIVA: Abas e loops reestruturados de forma linear sem o comando 'with' 🚨
+            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
                 "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
             ])
             
-            # Função interna compacta para renderizar os cartões limpos
+            # Injeta dados na Aba 1
+            if not lista_pdfs:
