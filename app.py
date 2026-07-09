@@ -121,46 +121,64 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura ou imagem foi localizada pelo Graxinim.")
         else:
-            # 🚨 MUDANÇA MECÂNICA: Triagem feita de forma em linha, eliminando o comando vertical 'for' das abas 🚨
+            lista_diagramas = []
+            lista_manuais = []
+            lista_foruns = []
+            lista_videos = []
+            
             plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram"]
             sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "topico", "comunidade"]
             termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
 
-            # Executa os filtros em background de forma segura
-            videos = [x for x in resultados if any(p in x.get("url","").lower() for p in plataformas_video)]
-            foruns = [x for x in resultados if any(f in x.get("url","").lower() or f in x.get("title","").lower() for f in sites_foruns)]
+            # Extrai apenas as palavras numéricas do motor escolhido para o pente fino rígido (ex: se for '2.0 8v', pega '2.0')
+            termo_motor_raiz = motor_selecionado.split()[0] 
+
+            for item in resultados:
+                link = item.get("url", "")
+                titulo = item.get("title", "")
+                link_min = link.lower()
+                tit_min = titulo.lower()
+                
+                # 🛡️ PENTE FINO 1: Bloqueia manuais de proprietário
+                if not incluir_manual_proprietario and any(t in tit_min for t in termos_bloqueados):
+                    continue
+
+                # 🛡️ PENTE FINO 2: Se o link falar de outro motor intruso (ex: fala de 2.2 ou 16v estando no 2.0 8v), descarta!
+                if termo_motor_raiz not in tit_min and termo_motor_raiz not in link_min:
+                    continue
+                if "16v" in motor_selecionado.lower() and "8v" in tit_min:
+                    continue
+                if "8v" in motor_selecionado.lower() and "16v" in tit_min:
+                    continue
+
+                # Triagem limpa por gavetas de mídias
+                if any(p in link_min for p in plataformas_video):
+                    lista_videos.append(item)
+                elif any(f in link_min for f in sites_foruns) or any(f in tit_min for f in sites_foruns):
+                    lista_foruns.append(item)
+                elif any(d in tit_min or d in link_min for d in ["diagrama", "esquema visual", "ponto de sincronismo", "imagem", "foto", "png", "jpg"]):
+                    lista_diagramas.append(item)
+                else:
+                    lista_manuais.append(item)
             
-            # Filtra os diagramas curtos e remove os manuais de proprietário invasores
-            restantes = [x for x in resultados if x not in videos and x not in foruns]
-            if not incluir_manual_proprietario:
-                restantes = [x for x in restantes if not any(t in x.get("title","").lower() for t in termos_bloqueados)]
-                foruns = [x for x in foruns if not any(t in x.get("title","").lower() for t in termos_bloqueados)]
-
-            diagramas = [x for x in restantes if any(d in x.get("title","").lower() or d in x.get("url","").lower() for d in ["diagrama", "esquema visual", "ponto", "sincronismo", "imagem", "foto", "png", "jpg"])]
-            manuais = [x for x in restantes if x not in diagramas]
-
-            # Inicializa as 5 Abas Visuais Limpas
+            # Inicializa as Abas
             aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
                 "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
             ])
             
-            # 🚨 INJEÇÃO COMPACTADA SEM RECUOS: O tradutor não consegue mover nenhuma linha abaixo! 🚨
-            # Aba 1: Diagramas
-            if not diagramas: aba_diag.info("Nenhum diagrama rápido isolado detectado.")
-            [aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True) for x in diagramas]
+            # 🚨 INJEÇÃO REMAPEADA COM LOOPS TRADICIONAIS LIVRES DE ERROS VISUAIS 🚨
+            
+            # Preenche Aba 1: Diagramas
+            if not lista_diagramas:
+                aba_diag.info("Nenhum diagrama rápido isolado detectado.")
+            for diag in lista_diagramas:
+                aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {diag.get("title")}</h4><a href="{diag.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True)
 
-            # Aba 2: Manuais
-            if not manuais: aba_pdf.info("Nenhum manual de oficina completo listado.")
-            [aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📚 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True) for x in manuais]
+            # Preenche Aba 2: Manuais
+            if not lista_manuais:
+                aba_pdf.info("Nenhum manual de oficina completo listado.")
+            for man in lista_manuais:
+                aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📚 {man.get("title")}</h4><a href="{man.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True)
 
-            # Aba 3: Imagens Miniaturas (Filtro Antiguanximim festa integrado)
+            # Preenche Aba 3: Imagens Miniaturas (Filtro Antiguaxinim integrado)
             termos_mecanicos = ["motor", "sincronismo", "correia", "corrente", "torque", "car", "auto", "mecanic", "astra", "chevrolet", "valvula", "passagem", "poly", "tensionador", "polia"]
-            imagens_filtradas = [img for img in imagens_encontradas if any(t in img.lower() for t in termos_mecanicos)]
-            if not imagens_filtradas: aba_img.info("Nenhuma miniatura de imagem técnica extraída.")
-            [aba_img.image(url_foto, use_container_width=True) for url_foto in imagens_filtradas[:6]]
-
-            # Aba 4: Fóruns
-            if not foruns: aba_forum.info("Nenhum debate de fórum localizado.")
-            [aba_forum.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">💬 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔗 Entrar no Tópico do Fórum Mecânico</a></div>', unsafe_allow_html=True) for x in foruns]
-
-            # Aba 5: Vídeos
