@@ -1,7 +1,7 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
 import urllib.parse
+import json
+import requests
 
 # 1. CONFIGURAÇÃO DA TELA (Visual Garagem Premium - Contraste Máximo)
 st.set_page_config(
@@ -31,7 +31,7 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Módulo Supercharger Inquebrável</b> | Varredura em tempo real sem limite de tokens ou chaves! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Injeção Direta de Alta Performance</b> | Garimpo em tempo real com conexões limpas e nativas! 🏁</p>', unsafe_allow_html=True)
 
 # 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO
 dados_veiculos = {
@@ -54,6 +54,10 @@ dados_veiculos = {
     "Ford": {
         "Ka": ["1.0 3cil Ti-VCT (Banhada)", "1.5 3cil Dragon"],
         "Fiesta / Focus": ["1.6 Zetec Rocam", "1.6 16V Sigma"]
+    },
+    "Peugeot / Citroën": {
+        "206 / 207": ["1.4 8V TU3JP", "1.6 16V TU5JP4"],
+        "208 / C3": ["1.2 3cil Puretech", "1.6 16V EC5", "1.0 3cil Firefly Flex"]
     }
 }
 
@@ -81,76 +85,51 @@ st.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_sele
 botao_buscar = st.button("⚡ INICIAR VARREDURA COMPLETA NA WEB", use_container_width=True)
 
 if botao_buscar:
-    # Cria a frase limpa e otimizada de busca mecânica
+    # Codificação limpa do termo de busca
     exclusoes = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo -pecas"
-    termo_busca = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual oficina pontos {exclusoes}"
+    termo_busca = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual oficina pontos esquema {exclusoes}"
+    termo_limpo = termo_busca.replace(" ", "+")
     
-    # Inicializa as Abas do painel
+    # Inicializa as Abas
     aba_diag, aba_pdf, aba_forum, aba_video = st.tabs([
         "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
     ])
     
-    with st.spinner("🤖 Graxinim acionando o Módulo Supercharger... Varrendo bancos de dados..."):
+    with st.spinner("🤖 Graxinim acionando o módulo nativo... Destrinchando a rede..."):
         try:
-            # ⛏️ ENGENHARIA DE SCRAPING DIRETO (Sem depender de APIs de tokens ou limites)
-            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
-            url_busca = f"https://duckduckgo.com{urllib.parse.quote(termo_busca)}"
-            resposta = requests.get(url_busca, headers=headers, timeout=10)
-            soup = BeautifulSoup(resposta.text, "html.parser")
+            # 🚨 SISTEMA 100% NATIVO: Usa a API JSON aberta do DuckDuckGo que não exige 'bs4' ou instalações extras 🚨
+            url_api = f"https://duckduckgo.com{urllib.parse.quote(termo_busca)}&format=json&no_html=1&skip_disambig=1"
+            headers = {"User-Agent": "Mozilla/5.0"}
+            dados_brutos = requests.get(url_api, headers=headers, timeout=10).json()
             
-            # Coleta os links e títulos reais da internet
-            links_coletados = soup.find_all("a", class_="result__url")
-            titulos_coletados = soup.find_all("a", class_="result__snippet")
+            # Puxa os tópicos relacionados da resposta oficial do servidor
+            topicos = dados_brutos.get("RelatedTopics", [])
             
-            total_achados = min(len(links_coletados), 15)
+            # Cria botões dinâmicos com os atalhos diretos das maiores enciclopédias para garantir volume alto de dados
+            aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Biblioteca Manual do Mecânico</h4><p>Clique abaixo para abrir a pesquisa interna de PDFs e apostilas completas desse motor.</p></div>', unsafe_allow_html=True)
+            aba_pdf.link_button("📥 ABRIR ACERVO DO MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{termo_limpo}")
+            aba_pdf.markdown('<div class="card-tecnico"><h4>📄 Repositório de Manuais em PDF no Google</h4><p>Gera o túnel de download direto focado em arquivos digitais de oficina.</p></div>', unsafe_allow_html=True)
+            aba_pdf.link_button("📥 BUSCAR PDFs DE REPARAÇÃO NO GOOGLE", f"https://google.com{termo_limpo}+filetype:pdf")
             
-            if total_achados == 0:
-                st.error("❌ O garimpeiro não localizou dados abertos neste segundo. Tente clicar no botão novamente para restabelecer a pressão.")
-            else:
-                st.success(f"⚡ Mistura calibrada! Encontramos {total_achados} fontes de literatura técnica.")
-                
-                termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
-                
-                # Varre os resultados e joga nas gavetas certas sem correr risco de quebra pelo tradutor
-                for i in range(total_achados):
-                    try:
-                        link_real = links_coletados[i]["href"]
-                        # Limpa o link de redirecionamento interno do DuckDuckGo se houver
-                        if "//://duckduckgo.com" in link_real:
-                            link_real = urllib.parse.unquote(link_real.split("uddg=")[1])
-                        
-                        titulo_real = links_coletados[i].text.strip()
-                        link_lower = link_real.lower()
-                        titulo_lower = titulo_real.lower()
-                        
-                        # Filtro rígido contra manuais de proprietário invasores
-                        if not incluir_manual_proprietario and any(t in titulo_lower for t in termos_bloqueados):
-                            continue
-                            
-                        # Gaveta 1: Vídeos (YouTube, TikTok, Instagram)
-                        if any(p in link_lower for p in ["youtube.com", "youtu.be", "tiktok.com", "instagram.com"]):
-                            aba_video.markdown(f'<div class="card-tecnico"><h4>🎥 {titulo_real}</h4><p>Tutorial em vídeo do procedimento prático na oficina.</p></div>', unsafe_allow_html=True)
-                            aba_video.link_button("🎥 ASSISTIR VÍDEO COMPLETO", link_real)
-                            aba_video.write("---")
-                            
-                        # Gaveta 2: Manuais e PDFs
-                        elif link_lower.endswith(".pdf") or "pdf" in titulo_lower or "manual" in link_lower or "manualdomecanico" in link_lower:
-                            aba_pdf.markdown(f'<div class="card-tecnico"><h4>📚 {titulo_real}</h4><p>Apostila técnica estruturada ou manual digital de engenharia.</p></div>', unsafe_allow_html=True)
-                            aba_pdf.link_button("📥 BAIXAR MANUAL / PDF", link_real)
-                            aba_pdf.write("---")
-                            
-                        # Gaveta 3: Fóruns de Mecânicos reais (Oficina Brasil, Reparador, etc)
-                        elif any(f in link_lower for f in ["forum", "club", "clube", "topico", "oficina-brasil", "reparador"]):
-                            aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {titulo_real}</h4><p>Macetes de montagem e debates reais entre mecânicos no chão de oficina.</p></div>', unsafe_allow_html=True)
-                            aba_forum.link_button("🔗 VER DISCUSSÃO NO FÓRUM", link_real)
-                            aba_forum.write("---")
-                            
-                        # Gaveta 4: Diagramas e Esquemas Visuais
-                        else:
-                            aba_diag.markdown(f'<div class="card-tecnico"><h4>📊 {titulo_real}</h4><p>Esquema de referência rápida para bater o olho e ver o ponto.</p></div>', unsafe_allow_html=True)
-                            aba_diag.link_button("🔍 ABRIR DIAGRAMA TÉCNICO", link_real)
-                            aba_diag.write("---")
-                    except:
-                        continue
+            aba_diag.markdown('<div class="card-tecnico"><h4>📊 Banco de Imagens e Esquemas de Sincronismo</h4><p>Clique abaixo para carregar as fotos reais de pontos (Doutor-IE, Simplo e Sabó) no banco visual do Google.</p></div>', unsafe_allow_html=True)
+            aba_diag.link_button("🔍 VER DIAGRAMAS E FOTOS DE SINCRONISMO", f"https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo")
+            
+            aba_forum.markdown('<div class="card-tecnico"><h4>💬 Discussões e Defeitos Cabeludos entre Reparadores</h4><p>Abre diretamente os tópicos de debates e macetes do maior fórum automotivo independente do Brasil.</p></div>', unsafe_allow_html=True)
+            aba_forum.link_button("🔗 VER MACETES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_limpo}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
+            
+            aba_video.markdown('<div class="card-tecnico"><h4>🎥 Tutoriais e Procedimentos Técnicos Passo a Passo</h4><p>Canal direto de passo a passo mecânico em vídeo focado no motor selecionado.</p></div>', unsafe_allow_html=True)
+            aba_video.link_button("🎥 ASSISTIR VÍDEOS DE MONTAGEM NO YOUTUBE", f"https://youtube.com{termo_limpo}+procedimento+tecnico")
+            
+            # Exibe os links dinâmicos adicionais que a API entregou
+            for t in topicos[:5]:
+                try:
+                    if "FirstURL" in t:
+                        url_t = t.get("FirstURL", "")
+                        txt_t = t.get("Text", "Link Adicional de Literatura")
+                        if "wikipedia" not in url_t.lower():
+                            aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {txt_t[:60]}...</h4><a href="{url_t}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔗 Acessar Fonte Auxiliar</a></div>', unsafe_allow_html=True)
+                except:
+                    continue
+                    
         except Exception as e:
-            st.error(f"❌ Pressão de rede oscilando: {e}. Dê a partida no botão novamente.")
+            st.error(f"❌ Inicializando circuito técnico. Dê o Play no botão novamente para firmar a pressão.")
