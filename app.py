@@ -16,7 +16,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+st.markdown('<p class="main-title">⚙️ Central de Literatura Técnico Automotiva</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">Garimpo Inteligente Separado por Vídeos Práticos e Materiais Didáticos de Engenharia</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
@@ -61,13 +61,13 @@ dados_veiculos = {
         "Ranger": ["2.2 Duratorq Diesel", "3.2 Duratorq Diesel", "2.3 Duratec Flex"]
     },
     "Chevrolet": {
-        "Onix": ["1.0 3cil Aspirado (Correia Banhada)", "1.0 3cil Turbo (Correia Banhada)", "1.0 8V SPE/4", "1.4 8V SPE/4"],
+        "Onix": ["1.0 3cil Aspirado", "1.0 3cil Turbo", "1.0 8V SPE/4", "1.4 8V SPE/4"],
         "Prisma": ["1.0 8V SPE/4", "1.4 8V SPE/4"],
         "Tracker": ["1.0 3cil Turbo", "1.2 3cil Turbo", "1.4 Turbo Ecotec", "1.8 16V Ecotec"],
         "Cruze": ["1.4 Turbo Ecotec", "1.8 16V Ecotec Flex"],
-        "S10": ["2.8 Duramax Diesel Turbodiesel", "2.4 Flexpower", "2.5 Ecotec SIDI Flex"],
-        "Celta": ["1.0 8V VHC/VHC-E"],
-        "Astra": ["2.0 8V Família 2"]
+        "S10": ["2.8 Duramax Diesel", "2.4 Flexpower", "2.5 Ecotec SIDI Flex"],
+        "Celta": ["1.0 8V VHC"],
+        "Astra": ["2.0 8V Familia 2"]
     }
 }
 
@@ -89,35 +89,30 @@ ano_selecionado = st.sidebar.selectbox("4. Ano do Modelo:", lista_anos, index=le
 tipo_material = st.sidebar.radio(
     "5. Tipo de Literatura Exigida:",
     [
-        "Diagrama de Sincronismo e Pontos de Referência", 
-        "Esquema de Instalação da Correia Poly-V", 
-        "Tabela de Torque de Cabeçote e Ordem de Aperto"
+        "Diagrama Sincronismo Pontos", 
+        "Instalacao Correia Poly-V", 
+        "Torque Cabecote Ordem Aperto"
     ]
 )
 
 st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Configurações Extra")
-# 🚨 NOVA REGULAGEM: Manual do proprietário desmarcado por padrão (Filtro Inteligente)
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DA CONSULTA DINÂMICA COM EXCLUSÕES
-exclusoes = (
-    "-site:mercadolivre.com.br -site:olx.com.br -site:shopee.com.br -site:aliexpress.com "
-    "-site:americanas.com.br -site:magazineluiza.com.br -site:autodoc.pt -site:pecasauto.pt"
-)
+# 5. MONTAGEM ULTRA-COMPACTA DA BUSCA (Garante ficar abaixo dos 400 caracteres)
+# Reduzimos drasticamente o tamanho das exclusões para economizar combustível de texto
+exclusoes_curtas = "-mercadolivre -olx -shopee -aliexpress -comprar -preco -venda"
 
 if not incluir_manual_proprietario:
-    exclusoes += ' -"manual do proprietario" -"manual de usuario" -"manual do condutor"'
+    exclusoes_curtas += ' -"proprietario" -"condutor"'
 
-comando_pesquisa = (
-    f'"{tipo_material}" motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} '
-    f'ano {ano_selecionado} "manual técnico" OR "esquema técnico" OR "pontos" OR "youtube.com" {exclusoes}'
-)
+# Monta a frase final de forma enxuta e direta
+comando_pesquisa = f'"{tipo_material}" motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {ano_selecionado} "manual tecnico" {exclusoes_curtas}'
 
 # Painel Central de Informações
 col1, col2 = st.columns(2)
 with col1:
-    st.info(f"⚙️ **Filtro Selecionado:**\n\n*{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado} ({ano_selecionado})*\n\n🛠️ *Componente: {tipo_material}*")
+    st.info(f"⚙️ **Filtro Ativo:**\n\n*{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado} ({ano_selecionado})*\n\n🛠️ *Componente: {tipo_material}*")
 with col2:
     st.write("")
     st.write("")
@@ -130,7 +125,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=8 # Aumentado para trazer mais opções visuais
+                max_results=8
             )
             resultados = resposta_ia.get("results", [])
         except Exception as e:
@@ -140,21 +135,19 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura ou vídeo foi localizado para essa configuração de motor.")
         else:
-            # Separa os resultados em listas de mídias diferentes
             lista_videos = []
             lista_manuais = []
             
             for item in resultados:
                 link = item.get("url", "")
-                if "youtube.com" in link.lower() or "youtu.be" in link.lower():
+                if "youtube" in link.lower() or "youtu.be" in link.lower():
                     lista_videos.append(item)
                 else:
                     lista_manuais.append(item)
             
-            # 🚨 SISTEMA DE ABAS PROFISSIONAIS NO PAINEL PRINCIPAL 🚨
+            # Abas visuais
             aba_manuais, aba_videos = st.tabs(["📚 Literaturas e Manuais Didáticos", "🎥 Vídeos Práticos e Macetes"])
             
-            # Exibição na Aba de Manuais
             with aba_manuais:
                 if not lista_manuais:
                     st.info("Nenhum arquivo de manual em PDF foi encontrado para este termo.")
@@ -167,16 +160,14 @@ if botao_buscar:
                             st.markdown(f"📥 **[Abrir Literatura / Esquema Técnico]({item.get('url')})**")
                             st.write("---")
             
-            # Exibição na Aba de Vídeos
             with aba_videos:
                 if not lista_videos:
-                    st.info("Nenhum vídeo técnico explicativo foi encontrado para este motor.")
+                    st.info("Nenhum vídeo técnico explicativo foi encontrado. Altere para buscar esquemas nas abas ou tente termos aproximados.")
                 else:
                     st.success(f"Encontramos {len(lista_videos)} vídeos com o procedimento prático:")
                     for i, item in enumerate(lista_videos):
                         with st.container():
                             st.markdown(f"#### 🎥 {i+1}. {item.get('title')}")
                             st.write(f"**Dica do vídeo:** {item.get('content')}")
-                            # Renderiza o reprodutor de vídeo do YouTube direto na tela da oficina!
                             st.video(item.get('url'))
                             st.write("---")
