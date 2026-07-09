@@ -1,24 +1,24 @@
 import streamlit as st
 from tavily import TavilyClient
 
-# 1. CONFIGURAÇÃO DA TELA (Front-End)
+# 1. CONFIGURAÇÃO DA TELA (Front-End Profissional)
 st.set_page_config(
     page_title="Acervo Técnico Automotivo - IA", 
     page_icon="⚙️", 
     layout="wide"
 )
 
-# Estilização visual de alto padrão
+# Estilização visual limpa e direta
 st.markdown("""
     <style>
     .main-title { font-size:32px !important; font-weight: bold; color: #1E3A8A; margin-bottom: 5px; }
     .sub-title { font-size:16px !important; color: #4B5563; margin-bottom: 25px; }
-    .card-tecnico { background-color: #FFFFFF; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #E5E7EB; border-left: 6px solid #1E3A8A; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .card-tecnico { background-color: #FFFFFF; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #E5E7EB; border-left: 6px solid #1E3A8A; }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Garimpo Avançado de Diagramas, Pontos de Sincronismo e Manuais de Engenharia</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Painel Avançado Filtrado por PDFs, Imagens, Fóruns, Vídeos e Portais Técnicos</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -109,7 +109,6 @@ veiculo_selecionado = st.sidebar.selectbox("2. Escolha o Veículo:", lista_veicu
 lista_motores = dados_veiculos[fabricante_selecionada][veiculo_selecionado]
 motor_selecionado = st.sidebar.selectbox("3. Escolha a Motorização:", lista_motores)
 
-# 🚨 MELHORIA: Cria a opção "Não Informar" no topo e deixa selecionada por padrão 🚨
 lista_anos = ["Não Informar (Buscar Todos)"] + [str(ano) for ano in range(2000, 2027)]
 ano_selecionado = st.sidebar.selectbox("4. Ano do Modelo (Opcional):", lista_anos, index=0)
 
@@ -122,32 +121,29 @@ tipo_material = st.sidebar.radio(
     ]
 )
 
-# 5. MONTAGEM DO COMANDO ENXUTO (Garante que a pesquisa trará resultados)
-exclusoes_ajustadas = "-scribd -issuu -mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
-
-# Adiciona o ano na frase de busca apenas se o mecânico escolheu um ano real
+# 5. MONTAGEM DO COMANDO - 100% LIBERADO PARA SITES PAGOS E SCRIBD
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 
-# Monta o termo de busca sem travas excessivas que geravam a tela em branco
-comando_pesquisa = f'"{tipo_material}" "{fabricante_selecionada} {veiculo_selecionado}" motor "{motor_selecionado}" {texto_ano} "manual" OR "pontos" {exclusoes_ajustadas}'
+# A frase agora inclui termos amplos para trazer fóruns, scribd, PDFs e tudo o que houver na web
+comando_pesquisa = f'"{tipo_material}" "{fabricante_selecionada} {veiculo_selecionado}" motor "{motor_selecionado}" {texto_ano} manual técnico'
 
 # Painel Central de Informações
 col1, col2 = st.columns(2)
 with col1:
-    st.info(f"⚙️ **Filtro Selecionado:** **{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}** ({ano_selecionado})\n\n🛠️ *Buscar:* **{tipo_material}**")
+    st.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
 with col2:
     st.write("")
     st.write("")
-    botao_buscar = st.button("🚀 Garimpar Esquemas e Imagens Técnicas", use_container_width=True)
+    botao_buscar = st.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
 
-# 6. PROCESSAMENTO E EXIBIÇÃO EM ABAS SEPARADAS
+# 6. PROCESSAMENTO E FILTRAGEM POR ABAS ESPECÍFICAS
 if botao_buscar:
-    with st.spinner("🤖 Vasculhando acervos abertos e gerando visualizações..."):
+    with st.spinner("🤖 Varrendo a internet inteira... Separando manuais, fóruns e mídias..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=10,
+                max_results=15, # Aumentado para abastecer todas as abas
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -156,39 +152,48 @@ if botao_buscar:
             st.error(f"❌ Falha de comunicação: {e}")
             resultados, imagens_encontradas = [], []
 
-        # Se a IA trouxe dados, nós exibimos direto sem fazer filtros destrutivos em Python
         if not resultados:
-            st.error("❌ Nenhuma literatura oficial ou imagem livre foi localizada para esta configuração. Tente deixar o Ano em aberto.")
+            st.error("❌ Nenhuma literatura foi localizada na web para esta configuração de motor.")
         else:
+            # Gavetas de separação para cada aba
+            lista_pdfs = []
+            lista_foruns = []
             lista_videos = []
-            lista_manuais = []
+            lista_portais = []
+            
             plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram", "kwai", "video"]
-            
+            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]
+
             for item in resultados:
-                link = item.get("url", "")
-                titulo = item.get("title", "")
+                link = item.get("url", "").lower()
+                titulo = item.get("title", "").lower()
                 
-                e_video = any(plataforma in link.lower() for plataforma in plataformas_video) or "video" in titulo.lower()
-                
-                if e_video:
+                # 1. Classifica se é Vídeo
+                if any(p in link for p in plataformas_video) or "video" in titulo:
                     lista_videos.append(item)
+                # 2. Classifica se é PDF de manual
+                elif link.endswith(".pdf") or "pdf" in titulo:
+                    lista_pdfs.append(item)
+                # 3. Classifica se é Fórum ou Comunidade de reparadores
+                elif any(f in link for f in sites_foruns) or any(f in titulo for f in sites_foruns):
+                    lista_foruns.append(item)
+                # 4. Caso contrário, joga nos portais gerais (Scribd, sites de fabricantes, etc)
                 else:
-                    lista_manuais.append(item)
+                    lista_portais.append(item)
             
-            # Estrutura de Abas
-            aba_manuais, aba_videos = st.tabs(["📚 Literaturas, Diagramas e Imagens", "🎥 Vídeos Práticos e Macetes"])
+            # 🚨 CRIAÇÃO DAS 5 ABAS SOLICITADAS NO PAINEL PRINCIPAL 🚨
+            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
+                "📚 1. Manuais em PDF", 
+                "🖼️ 2. Fotos e Imagens", 
+                "💬 3. Fóruns Mecânicos", 
+                "🎥 4. Vídeos e Macetes", 
+                "🌐 5. Portais Técnicos (Scribd/Gerais)"
+            ])
             
-            with aba_manuais:
-                if imagens_encontradas:
-                    st.subheader("🖼️ Miniaturas de Diagramas Localizadas:")
-                    cols_img = st.columns(min(len(imagens_encontradas), 4))
-                    for idx, img_url in enumerate(imagens_encontradas[:4]):
-                        with cols_img[idx]:
-                            st.image(img_url, caption=f"Diagrama Localizado {idx+1}", use_container_width=True)
-                    st.write("---")
-                
-                if not lista_manuais:
-                    st.info("Nenhum arquivo de texto passou pelas barreiras gratuitas. Verifique a aba de vídeos.")
+            # ABA 1: MANUAIS EM PDF
+            with aba_pdf:
+                if not lista_pdfs:
+                    st.info("Nenhum arquivo PDF direto foi detectado nesta busca.")
                 else:
-                    st.subheader("📋 Fontes de Manuais e Artigos Livres:")
-                    for i, item in enumerate(lista_manuais):
+                    st.success(f"Encontramos {len(lista_pdfs)} manuais e apostilas em formato PDF:")
+                    for item in lista_pdfs:
