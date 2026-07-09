@@ -23,7 +23,7 @@ st.markdown("""
     div[data-testid="stMarkdownContainer"] p, label, .stSelectbox label { color: #FFFFFF !important; }
     
     /* Estilização dos botões para padrão Oficina de Competição */
-    .stLinkButton button { background-color: #F59E0B !important; color: #111827 !important; font-weight: bold !important; border-radius: 8px !important; width: 100% !important; }
+    .stLinkButton button { background-color: #F59E0B !important; color: #111827 !important; font-weight: bold !important; border-radius: 8px !important; width: 100% !important; height: 50px !important; font-size: 16px !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -90,46 +90,32 @@ if botao_buscar:
     termo_busca = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual oficina pontos esquema {exclusoes}"
     termo_limpo = termo_busca.replace(" ", "+")
     
-    # Inicializa as Abas
+    # Inicializa as 4 Abas Oficiais Corretas
     aba_diag, aba_pdf, aba_forum, aba_video = st.tabs([
         "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
     ])
     
-    with st.spinner("🤖 Graxinim acionando o módulo nativo... Destrinchando a rede..."):
-        try:
-            # 🚨 SISTEMA 100% NATIVO: Usa a API JSON aberta do DuckDuckGo que não exige 'bs4' ou instalações extras 🚨
-            url_api = f"https://duckduckgo.com{urllib.parse.quote(termo_busca)}&format=json&no_html=1&skip_disambig=1"
-            headers = {"User-Agent": "Mozilla/5.0"}
-            dados_brutos = requests.get(url_api, headers=headers, timeout=10).json()
-            
-            # Puxa os tópicos relacionados da resposta oficial do servidor
-            topicos = dados_brutos.get("RelatedTopics", [])
-            
-            # Cria botões dinâmicos com os atalhos diretos das maiores enciclopédias para garantir volume alto de dados
-            aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Biblioteca Manual do Mecânico</h4><p>Clique abaixo para abrir a pesquisa interna de PDFs e apostilas completas desse motor.</p></div>', unsafe_allow_html=True)
-            aba_pdf.link_button("📥 ABRIR ACERVO DO MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{termo_limpo}")
-            aba_pdf.markdown('<div class="card-tecnico"><h4>📄 Repositório de Manuais em PDF no Google</h4><p>Gera o túnel de download direto focado em arquivos digitais de oficina.</p></div>', unsafe_allow_html=True)
-            aba_pdf.link_button("📥 BUSCAR PDFs DE REPARAÇÃO NO GOOGLE", f"https://google.com{termo_limpo}+filetype:pdf")
-            
-            aba_diag.markdown('<div class="card-tecnico"><h4>📊 Banco de Imagens e Esquemas de Sincronismo</h4><p>Clique abaixo para carregar as fotos reais de pontos (Doutor-IE, Simplo e Sabó) no banco visual do Google.</p></div>', unsafe_allow_html=True)
-            aba_diag.link_button("🔍 VER DIAGRAMAS E FOTOS DE SINCRONISMO", f"https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo")
-            
-            aba_forum.markdown('<div class="card-tecnico"><h4>💬 Discussões e Defeitos Cabeludos entre Reparadores</h4><p>Abre diretamente os tópicos de debates e macetes do maior fórum automotivo independente do Brasil.</p></div>', unsafe_allow_html=True)
-            aba_forum.link_button("🔗 VER MACETES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_limpo}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
-            
-            aba_video.markdown('<div class="card-tecnico"><h4>🎥 Tutoriais e Procedimentos Técnicos Passo a Passo</h4><p>Canal direto de passo a passo mecânico em vídeo focado no motor selecionado.</p></div>', unsafe_allow_html=True)
-            aba_video.link_button("🎥 ASSISTIR VÍDEOS DE MONTAGEM NO YOUTUBE", f"https://youtube.com{termo_limpo}+procedimento+tecnico")
-            
-            # Exibe os links dinâmicos adicionais que a API entregou
-            for t in topicos[:5]:
-                try:
-                    if "FirstURL" in t:
-                        url_t = t.get("FirstURL", "")
-                        txt_t = t.get("Text", "Link Adicional de Literatura")
-                        if "wikipedia" not in url_t.lower():
-                            aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {txt_t[:60]}...</h4><a href="{url_t}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔗 Acessar Fonte Auxiliar</a></div>', unsafe_allow_html=True)
-                except:
-                    continue
-                    
-        except Exception as e:
-            st.error(f"❌ Inicializando circuito técnico. Dê o Play no botão novamente para firmar a pressão.")
+    # Executa a renderização dos cartões e botões nativos de alto torque
+    try:
+        # Aba 1: Diagramas
+        aba_diag.markdown('<div class="card-tecnico"><h4>📊 Banco de Imagens e Esquemas de Sincronismo</h4><p>Clique abaixo para carregar as fotos reais de pontos (Doutor-IE, Simplo e Sabó) no banco visual do Google.</p></div>', unsafe_allow_html=True)
+        aba_diag.link_button("🔍 VER DIAGRAMAS E FOTOS DE SINCRONISMO", f"https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo")
+        
+        # Aba 2: PDFs e Manuais
+        aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Biblioteca Manual do Mecânico</h4><p>Clique abaixo para abrir a pesquisa interna de PDFs e apostilas completas desse motor.</p></div>', unsafe_allow_html=True)
+        aba_pdf.link_button("📥 ABRIR ACERVO DO MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{termo_limpo}")
+        aba_pdf.markdown('<div class="card-tecnico"><h4>📄 Repositório de Manuais em PDF no Google</h4><p>Gera o túnel de download direto focado em arquivos digitais de oficina.</p></div>', unsafe_allow_html=True)
+        aba_pdf.link_button("📥 BUSCAR PDFs DE REPARAÇÃO NO GOOGLE", f"https://google.com{termo_limpo}+filetype:pdf")
+        
+        # Aba 3: Fóruns Mecânicos
+        aba_forum.markdown('<div class="card-tecnico"><h4>💬 Discussões e Defeitos Cabeludos entre Reparadores</h4><p>Abre diretamente os tópicos de debates e macetes do maior fórum automotivo independente do Brasil.</p></div>', unsafe_allow_html=True)
+        aba_forum.link_button("🔗 VER MACETES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_limpo}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
+        
+        # Aba 4: Vídeos e Macetes
+        aba_video.markdown('<div class="card-tecnico"><h4>🎥 Tutoriais e Procedimentos Técnicos Passo a Passo</h4><p>Canal direto de passo a passo mecânico em vídeo focado no motor selecionado.</p></div>', unsafe_allow_html=True)
+        aba_video.link_button("🎥 ASSISTIR VÍDEOS DE MONTAGEM NO YOUTUBE", f"https://youtube.com{termo_limpo}+procedimento+tecnico")
+        
+        st.success("⚡ Módulo remapeado com sucesso! Utilize os botões amarelos de cada aba acima para abrir a literatura.")
+        
+    except Exception as e:
+        st.error("❌ Ocorreu um erro na montagem dos botões. Tente reiniciar a página.")
