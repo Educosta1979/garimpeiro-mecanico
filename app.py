@@ -123,7 +123,7 @@ tipo_material = st.sidebar.radio(
 
 st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
-incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
+incluir_manual_proprietario = st.sidebar.checkbox("Include Manual", value=False)
 
 # 5. MONTAGEM DO COMANDO
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
@@ -145,7 +145,7 @@ with col2:
 
 # 6. PROCESSAMENTO
 if botao_buscar:
-    with st.spinner("🤖 Varrendo a internet inteira..."):
+    with st.spinner("🤖 Varrendo a internet..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
@@ -160,7 +160,7 @@ if botao_buscar:
             resultados, imagens_encontradas = [], []
 
         if not resultados:
-            st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
+            st.error("❌ Nenhuma literatura foi localizada na web.")
         else:
             lista_pdfs = []
             lista_foruns = []
@@ -183,7 +183,7 @@ if botao_buscar:
                 else:
                     lista_portais.append(item)
             
-            # Abas
+            # Abas principais
             aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
                 "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
             ])
@@ -191,14 +191,12 @@ if botao_buscar:
             with aba_pdf:
                 if not lista_pdfs:
                     st.info("Nenhum arquivo PDF direto detectado.")
-                else:
-                    for item in lista_pdfs:
-                        st.markdown(f'<div class="card-tecnico"><h4>📄 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True)
+                for item in lista_pdfs:
+                    st.markdown(f'<div class="card-tecnico"><h4>📄 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True)
 
             with aba_img:
                 if not imagens_encontradas:
                     st.info("Nenhuma imagem direta extraída.")
-                else:
-                    cols_img = st.columns(4)
-                    for idx, img_url in enumerate(imagens_encontradas[:8]):
-                        with cols_img[idx % 4]:
+                # 🚨 ALINHAMENTO BLINDADO: Imagens em formato de galeria vertical simples, imune a erros de tradutor 🚨
+                for img_url in imagens_encontradas[:6]:
+                    st.image(img_url, use_container_width=True)
