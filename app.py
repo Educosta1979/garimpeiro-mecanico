@@ -3,8 +3,8 @@ from tavily import TavilyClient
 
 # 1. CONFIGURAÇÃO DA TELA (Front-End)
 st.set_page_config(
-    page_title="Acervo Técnico Automotivo - IA", 
-    page_icon="⚙️", 
+    page_title="Central do Graxinim - Literatura Automotiva", 
+    page_icon="🦝", 
     layout="wide"
 )
 
@@ -17,10 +17,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# APRESENTAÇÃO DO NOVO CHEFE DA OFICINA
-st.image("https://wikimedia.org", width=110, caption="Graxinim Chefe 🦝")
-st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
+# 🚨 LOGO DO GRAXINIM ATUALIZADA COM ÍCONE DO SISTEMA (NUNCA QUEBRA!) 🚨
+col_logo, col_texto_topo = st.columns([1, 9])
+col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim Chefe - Buscando Doutor-IE, Simplo, Dicatec e Manuais do Mecânico! 🛠️🚘</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -77,25 +78,6 @@ dados_veiculos = {
     "Hyundai / Kia": {
         "HB20 / HB20S / Creta": ["1.0 3cil Kappa", "1.0 3cil Kappa Turbo GDI", "1.6 16V Gamma", "2.0 16V Nu Flex"],
         "HR / Bongo / Tucson": ["2.5 Diesel Turbo D4CB", "2.5 Diesel Turbo D4BH", "2.0 16V Beta"]
-    },
-    "Peugeot / Citroën": {
-        "206 / 207 / 208 / C3": ["1.4 8V TU3JP", "1.6 16V TU5JP4", "1.2 3cil Puretech", "1.0 3cil Firefly Flex", "1.6 16V EC5"],
-        "308 / 408 / 2008 / C4 Cactus": ["1.6 16V EC5", "1.6 16V THP Turbo (Prince)", "2.0 16V EW10A"]
-    },
-    "Nissan": {
-        "March / Versa / Kicks / Sentra": ["1.0 3cil HR10DE", "1.6 16V HR16DE", "2.0 16V MR20DE"],
-        "Frontier": ["2.5 Diesel YD25", "2.3 16V Diesel BiTurbo"]
-    },
-    "Mitsubishi": {
-        "L200 Triton / Pajero": ["3.2 DI-D Diesel", "2.4 Diesel Mivec", "3.5 V6 Flex", "2.5 Diesel 4D56"]
-    },
-    "Caoa Chery": {
-        "Tiggo 2 / Tiggo 3X": ["1.5 16V Acteco Flex", "1.0 Turbo 3cil"],
-        "Tiggo 5X / Tiggo 7 / Tiggo 8": ["1.5 Turbo Flex", "1.6 Turbo GDI"]
-    },
-    "JAC Motors": {
-        "J3 / J5 / J6": ["1.3 16V VVT", "1.5 16V VVT", "2.0 16V"],
-        "T40 / T50 / T60": ["1.5 16V VVT Flex", "1.6 16V DVVT"]
     }
 }
 
@@ -127,14 +109,21 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DO COMANDO
+# 5. ESTRUTURAÇÃO DO COMANDO TURBINADO (Injetando Doutor-IE, Simplo e o site enviado)
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
 
-comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos forum youtube {exclusoes_ajustadas}"
+# 🔥 LOGICA SECRETA: Força a busca a cruzar os dados do motor com as grandes enciclopédias técnicas e o site do print
+comando_pesquisa = (
+    f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} "
+    f"site:manualdomecanico.com.br OR \"doutor ie\" OR \"simplo\" OR \"dicatek\" OR \"mecanica 2000\" "
+    f"esquema pontos forum youtube {exclusoes_ajustadas}"
+)
 
-st.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-botao_buscar = st.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
+# Painel Central de Informações
+col_info, col_btn = st.columns(2)
+col_info.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
+botao_buscar = col_btn.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
 
 # 6. PROCESSAMENTO
 if botao_buscar:
@@ -143,7 +132,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=12,
+                max_results=20,
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -155,29 +144,44 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
         else:
-            # 🚨 DESIGN RETIFICADO: Sem loops complexos nas abas. Tudo plano e direto! 🚨
-            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
-                "📚 Manuais em PDF", "🖼️ Fotos e Imagens", "💬 Fóruns Mecânicos", "🎥 Vídeos e Macetes", "🌐 Portais Gerais"
-            ])
+            lista_pdfs = []
+            lista_foruns = []
+            lista_videos = []
+            lista_portais = []
             
-            # Preenche as abas injetando os dados de forma sequencial simples
-            for x in resultados:
-                url_baixa = x.get("url", "").lower()
-                tit_baixo = x.get("title", "")
+            plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram", "kwai", "video"]
+            sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "injetronic"]
+            termos_bloqueados_manuais = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
+
+            for item in resultados:
+                link = item.get("url", "")
+                titulo = item.get("title", "")
                 
-                # Bloqueio de manuais de proprietário
-                if not incluir_manual_proprietario and any(t in tit_baixo.lower() for t in ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]):
+                if not incluir_manual_proprietario and any(termo in titulo.lower() for termo in termos_bloqueados_manuais):
                     continue
 
-                if any(p in url_baixa for p in ["youtube", "youtu.be", "tiktok", "instagram"]):
-                    aba_video.markdown(f'#### 🎥 {tit_baixo}')
-                    aba_video.markdown(f'[🔗 Abrir Link do Vídeo]({x.get("url")})')
-                    aba_video.write("---")
-                elif url_baixa.endswith(".pdf") or "pdf" in tit_baixo.lower():
-                    aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {tit_baixo}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir/Baixar PDF</a></div>', unsafe_allow_html=True)
-                elif any(f in url_baixa for f in ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]):
-                    aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {tit_baixo}</h4><a href="{x.get("url")}" target="_blank">🔗 Acessar Fórum</a></div>', unsafe_allow_html=True)
+                if any(p in link.lower() for p in plataformas_video) or "video" in titulo.lower():
+                    lista_videos.append(item)
+                elif link.lower().endswith(".pdf") or "pdf" in titulo.lower() or "manualdomecanico.com.br" in link.lower():
+                    lista_pdfs.append(item)
+                elif any(f in link.lower() for f in sites_foruns) or any(f in titulo.lower() for f in sites_foruns):
+                    lista_foruns.append(item)
                 else:
-                    aba_portais.markdown(f'<div class="card-tecnico"><h4>🌐 {tit_baixo}</h4><a href="{x.get("url")}" target="_blank">🔗 Abrir Link Geral</a></div>', unsafe_allow_html=True)
+                    lista_portais.append(item)
+            
+            # Abas principais
+            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
+                "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
+            ])
+            
+            # Preenchimento da Aba 1 (PDF e site Manual do Mecânico)
+            if not lista_pdfs:
+                aba_pdf.info("Nenhum arquivo PDF direto detectado.")
+            for item in lista_pdfs:
+                aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir Literatura Técnica / Download</a></div>', unsafe_allow_html=True)
 
-            # Injeta as imagens na aba 2
+            # Preenchimento da Aba 2 (Imagens - Alinhadas sem quebra)
+            if not imagens_encontradas:
+                aba_img.info("Nenhuma imagem direta extraída. Tente abrir os links da aba de PDF ou Portais para ver as fotos internas.")
+            else:
+                aba_img.success(f"Encontramos {len(imagens_encontradas)} esquemas visuais coletados na internet:")
