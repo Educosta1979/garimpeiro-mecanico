@@ -17,8 +17,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Painel Avançado Filtrado por PDFs, Imagens, Fóruns, Vídeos e Portais Técnicos</p>', unsafe_allow_html=True)
+# 🚨 APRESENTAÇÃO DO NOVO CHEFE DA OFICINA: O MASCOTE GRAXINIM 🚨
+col_logo, col_texto_topo = st.columns([1, 4])
+with col_logo:
+    # Usando uma imagem ilustrativa temporária de Guaxinim Mecânico via URL pública estável
+    st.image("https://unsplash.com", width=120, caption="Graxinim Chefe 🦝")
+with col_texto_topo:
+    st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title"><b>Mascote Oficial:</b> Graxinim, o Guaxinim de boné e macacão cheio de graxa ajudando no sincronismo! 🦝🛠️</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -132,17 +138,17 @@ exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalo
 comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos forum youtube {exclusoes_ajustadas}"
 
 # Painel Central de Informações
-col1, col2 = st.columns(2)
-with col1:
+col_info, col_btn = st.columns(2)
+with col_info:
     st.info(f"⚙️ **Buscando:** {tipo_material} | **Carro:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-with col2:
+with col_btn:
     st.write("")
     st.write("")
     botao_buscar = st.button("🚀 Garimpar Literatura Total (Mão na Massa)", use_container_width=True)
 
 # 6. PROCESSAMENTO
 if botao_buscar:
-    with st.spinner("🤖 Varrendo a internet..."):
+    with st.spinner("🤖 Graxinim varrendo a internet..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
@@ -184,14 +190,9 @@ if botao_buscar:
                 else:
                     lista_portais.append(item)
             
-            # Abas principais
-            aba_pdf, aba_img, aba_forum, aba_video, aba_portais = st.tabs([
+            # 🚨 ABAS SOLICITADAS: Isoladas de forma linear, 100% protegidas contra recuos fantasmas do tradutor 🚨
+            abas = st.tabs([
                 "📚 1. Manuais em PDF", "🖼️ 2. Fotos e Imagens", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes", "🌐 5. Portais Técnicos (Scribd/Gerais)"
             ])
             
-            with aba_pdf:
-                if not lista_pdfs: st.info("Nenhum arquivo PDF direto detectado.")
-                # 🚨 ATUALIZAÇÃO BLINDADA: Loop condensado em uma única linha estrutural à prova de tradutor!
-                [st.markdown(f'<div class="card-tecnico"><h4>📄 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True) for x in lista_pdfs]
-
-            with aba_img:
+            # Função interna compacta para renderizar os cartões limpos
