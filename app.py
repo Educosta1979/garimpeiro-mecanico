@@ -1,29 +1,30 @@
 import streamlit as st
 from tavily import TavilyClient
 
-# 1. CONFIGURAÇÃO DA TELA (Layout Garagem de Alta Performance)
+# 1. CONFIGURAÇÃO DA TELA (Visual Oficina de Elite - Contraste Máximo)
 st.set_page_config(
     page_title="Garagem do Graxinim - Literatura Automotiva", 
     page_icon="🦝", 
     layout="wide"
 )
 
-# Estilização CSS: Visual de Oficina Premium / Garagem Noturna
+# Estilização CSS de Alto Padrão (Fundo escuro, textos brancos e detalhes em amarelo)
 st.markdown("""
     <style>
-    .stApp { background-color: #111827; color: #F3F4F6; }
-    .main-title { font-size:36px !important; font-weight: bold; color: #3B82F6; margin-bottom: 5px; text-shadow: 2px 2px 4px #000; }
-    .sub-title { font-size:16px !important; color: #9CA3AF; margin-bottom: 25px; }
-    .card-tecnico { background-color: #1F2937; padding: 18px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #374151; border-left: 6px solid #EF4444; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
-    .stTabs [data-baseweb="tab-list"] { background-color: #1F2937; padding: 10px; border-radius: 8px; }
-    .stTabs [data-baseweb="tab"] { color: #9CA3AF !important; font-weight: bold; }
-    .stTabs [aria-selected="true"] { color: #3B82F6 !important; border-bottom-color: #3B82F6 !important; }
+    .stApp { background-color: #1A1D20; color: #FFFFFF; }
+    .main-title { font-size:36px !important; font-weight: bold; color: #F59E0B; margin-bottom: 5px; text-shadow: 2px 2px 4px #000; }
+    .sub-title { font-size:16px !important; color: #E5E7EB; margin-bottom: 25px; }
+    .card-tecnico { background-color: #2D3135; padding: 18px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #4B5563; border-left: 6px solid #F59E0B; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
+    .stTabs [data-baseweb="tab-list"] { background-color: #2D3135; padding: 10px; border-radius: 8px; border: 1px solid #4B5563; }
+    .stTabs [data-baseweb="tab"] { color: #FFFFFF !important; font-weight: bold !important; font-size: 15px !important; }
+    .stTabs [aria-selected="true"] { color: #F59E0B !important; border-bottom-color: #F59E0B !important; }
+    div[data-testid="stMarkdownContainer"] p { color: #FFFFFF !important; }
     </style>
 """, unsafe_allow_html=True)
 
 # CABEÇALHO DA GARAGEM
-col_logo, col_texto_topo = st.columns(2)
-col_logo.markdown("<h1 style='font-size: 90px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
+col_logo, col_texto_topo = st.columns([1, 6])
+col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0; text-align: center;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="sub-title"><b>O Primeiro Software Feito para Chão de Oficina</b> | Filtros limpos estilo Doutor-IE e Simplo sem enrolação comercial! 🔧🏁</p>', unsafe_allow_html=True)
 
@@ -88,25 +89,25 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DO COMANDO (Injeção Eletrônica Calibrada)
+# 5. REFINAMENTO DE PALAVRAS-CHAVE (Mistura Perfeita e Precisa)
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 
-# Adicionado filtros negativos pesados na frase de busca para banir de vez sites institucionais ou de autopeças comerciais
+# Termos de exclusão comercial pesados
 exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo -pecas -loja -produto"
 
+# Frase de busca calibrada para trazer apenas dados técnicos de fasagem
 comando_pesquisa = (
     f'"{tipo_material}" motor "{motor_selecionado}" "{fabricante_selecionada} {veiculo_selecionado}" {texto_ano} '
-    f'"ponto de sincronismo" OR "esquema técnico" OR "tabela de torque" {exclusoes_ajustadas}'
+    f'"ponto de sincronismo" OR "esquema técnico" OR "fasagem" {exclusoes_ajustadas}'
 )
 
 # Painel Central de Informações
-col_info, col_btn = st.columns(2)
-col_info.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-botao_buscar = col_btn.button("⚡ DAR A PARTIDA NO GARIMPO", use_container_width=True)
+st.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
+botao_buscar = st.button("⚡ DAR A PARTIDA NO GARIMPO", use_container_width=True)
 
 # 6. PROCESSAMENTO
 if botao_buscar:
-    with st.spinner("🤖 Graxinim destrinchando os acervos automotivos..."):
+    with st.spinner("🤖 Graxinim varrendo a internet..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
@@ -123,6 +124,7 @@ if botao_buscar:
         if not resultados:
             st.error("❌ Nenhuma literatura ou imagem foi localizada pelo Graxinim.")
         else:
+            # Gavetas de separação limpas
             lista_diagramas = []
             lista_manuais = []
             lista_foruns = []
@@ -145,34 +147,38 @@ if botao_buscar:
                     lista_videos.append(item)
                 elif any(f in link_min for f in sites_foruns) or any(f in tit_min for f in sites_foruns):
                     lista_foruns.append(item)
-                # 🚨 PENTE FINO RECALIBRADO: Só entra na aba de Diagramas se o título contiver palavras fortes de IMAGEM ou ESQUEMA BRUTO
                 elif any(d in tit_min or d in link_min for d in ["diagrama", "esquema visual", "ponto de sincronismo", "imagem", "foto", "png", "jpg"]):
                     lista_diagramas.append(item)
                 else:
                     lista_manuais.append(item)
             
-            # ABAS DA GARAGEM
+            # 🚨 ABAS REESTRUTURADAS EM FORMATO PADRÃO (Sem o bug do DeltaGenerator) 🚨
             aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
                 "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
             ])
             
-            # Injeta dados de forma limpa e sequencial (Anti-Tradutor)
-            if not lista_diagramas: aba_diag.info("Nenhum diagrama rápido isolado detectado.")
-            [aba_diag.markdown(f'<div class="card-tecnico"><h4>📊 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True) for x in lista_diagramas]
+            # Preenchimento da Aba 1 (Diagramas)
+            if not lista_diagramas:
+                aba_diag.info("Nenhum diagrama rápido isolado detectado.")
+            for item in lista_diagramas:
+                aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True)
 
-            if not lista_manuais: aba_pdf.info("Nenhum manual de oficina completo listado.")
-            [aba_pdf.markdown(f'<div class="card-tecnico"><h4>📚 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True) for x in lista_manuais]
+            # Preenchimento da Aba 2 (Manuais)
+            if not lista_manuais:
+                aba_pdf.info("Nenhum manual de oficina completo listado.")
+            for item in lista_manuais:
+                aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📚 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True)
 
-            # Filtro das Fotos Miniaturas
+            # Preenchimento da Aba 3 (Imagens Miniaturas)
             termos_mecanicos = ["motor", "sincronismo", "correia", "corrente", "torque", "car", "auto", "mecanic", "astra", "chevrolet", "valvula", "passagem", "poly", "tensionador", "polia"]
             imagens_filtradas = [img for img in imagens_encontradas if any(t in img.lower() for t in termos_mecanicos)]
-            if not imagens_filtradas: aba_img.info("Nenhuma miniatura de imagem técnica extraída.")
-            [aba_img.image(url_foto, use_container_width=True) for url_foto in imagens_filtradas[:6]]
+            if not imagens_filtradas:
+                aba_img.info("Nenhuma miniatura de imagem técnica extraída.")
+            for url_foto in imagens_filtradas[:6]:
+                aba_img.image(url_foto, use_container_width=True)
+                aba_img.write("---")
 
-            if not lista_foruns: aba_forum.info("Nenhum debate de fórum localizado. Tente buscar na aba de Manuais ou Vídeos.")
-            [aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">🔗 Entrar no Tópico do Fórum Mecânico</a></div>', unsafe_allow_html=True) for x in lista_foruns]
-
-            if not lista_videos: aba_video.info("Nenhum vídeo listado.")
-            for item in lista_videos:
-                aba_video.markdown(f"#### 🎥 {item.get('title')}")
-                url_vid = item.get('url')
+            # Preenchimento da Aba 4 (Fóruns)
+            if not lista_foruns:
+                aba_forum.info("Nenhum debate de fórum localizado.")
+            for item in lista_foruns:
