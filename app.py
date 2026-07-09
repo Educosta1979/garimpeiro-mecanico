@@ -30,7 +30,7 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Alta Performance com Botões Reais</b> | Chega de links travados, agora o clique é direto! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Links Diretos Calibrados</b> | Alinhamento de URL corrigido para abertura instantânea! 🏁</p>', unsafe_allow_html=True)
 
 # 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO E SEPARADO
 dados_veiculos = {
@@ -72,18 +72,20 @@ tipo_material = st.sidebar.radio(
     ["Sincronismo do Motor", "Esquema Correia Poly-V"]
 )
 
-st.sidebar.write("---")
-st.sidebar.subheader("⚙️ Opções Adicionais")
-incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
-
 st.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
 botao_buscar = st.button("⚡ CONECTAR ACERVOS AUTOMOTIVOS", use_container_width=True)
 
 if botao_buscar:
-    # Codificação limpa trocando espaços por '+' para evitar travamento de leitura dos navegadores
-    termo_bruto = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado}"
-    termo_limpo = termo_bruto.replace(" ", "+")
+    # 🚨 FORMATADOR DE ALTA PERFORMANCE: Converte as palavras para o padrão exato exigido pela web 🚨
+    veiculo_motor_busca = f"{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}"
+    veiculo_motor_url = urllib.parse.quote_plus(veiculo_motor_busca)
     
+    termo_completo_busca = f"{tipo_material} {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}"
+    termo_completo_url = urllib.parse.quote_plus(termo_completo_busca)
+    
+    # 🚨 EXCLUSÃO DE BLOQUEIOS PAGOS DIRETO NA CONSULTA DO GOOGLE 🚨
+    exclusoes_pagas = urllib.parse.quote_plus("-site:scribd.com -site:issuu.com -site:slideshare.net")
+
     # GERAÇÃO DE TEXTO POR IA TOTALMENTE GRATUITA VIA SERVIDOR LIVRE
     with st.spinner("🤖 Graxinim gerando ficha técnica rápida por IA..."):
         prompt_ia = (
@@ -107,27 +109,27 @@ if botao_buscar:
     aba_ia.subheader("📋 Resumo de Bancada por IA")
     aba_ia.write(texto_ia)
     
-    # 🚨 ABAS ATUALIZADAS COM BOTÕES NATIVOS (st.link_button) - CLIQUE 100% GARANTIDO 🚨
+    # 🚨 BOTÕES CALIBRADOS PARA ABERTURA TOTAL E SEM SITES PAGOS 🚨
     
     # Aba 2: Manuais e PDFs
     aba_pdf.subheader("📚 Bibliotecas e Arquivos de Manuais:")
-    aba_pdf.markdown('<div class="card-tecnico"><h4>Manual do Mecânico</h4><p>Clique abaixo para abrir a lista completa de manuais e esquemas desse motor dentro do portal.</p></div>', unsafe_allow_html=True)
-    aba_pdf.link_button("📥 ABRIR MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{termo_limpo}")
+    aba_pdf.markdown('<div class="card-tecnico"><h4>Manual do Mecânico (Acesso Direto)</h4><p>Focado na busca direta do banco de dados interno deles apenas pelo nome do carro e motorização.</p></div>', unsafe_allow_html=True)
+    aba_pdf.link_button("📥 ABRIR MANUAL DO MECÂNICO", f"https://manualdomecanico.com.br{veiculo_motor_url}")
     
-    aba_pdf.markdown('<div class="card-tecnico"><h4>Buscador de PDFs de Engenharia</h4><p>Varredura direta no Google filtrando apenas por arquivos densos em formato PDF.</p></div>', unsafe_allow_html=True)
-    aba_pdf.link_button("📥 BUSCAR MANUAIS EM PDF NO GOOGLE", f"https://google.com{termo_limpo}+filetype:pdf")
+    aba_pdf.markdown('<div class="card-tecnico"><h4>Buscador de PDFs de Engenharia Livre</h4><p>Pesquisa refinada que oculta Scribd e traz apenas apostilas em PDF abertas para baixar.</p></div>', unsafe_allow_html=True)
+    aba_pdf.link_button("📥 BUSCAR MANUAIS EM PDF NO GOOGLE", f"https://google.com{termo_completo_url}+filetype:pdf+{exclusoes_pagas}")
     
     # Aba 3: Fotos e Imagens
     aba_img.subheader("🖼️ Diagramas Visuais de Ponto e Fasagem:")
-    aba_img.markdown('<div class="card-tecnico"><h4>Google Imagens Técnico</h4><p>Banco de dados visual filtrado secretamente pelas maiores enciclopédias (Doutor-IE, Simplo e Sabó).</p></div>', unsafe_allow_html=True)
-    aba_img.link_button("🔍 VER FOTOS DE SINCRONISMO", f"https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo")
+    aba_img.markdown('<div class="card-tecnico"><h4>Google Imagens Técnico Desbloqueado</h4><p>Banco de dados visual focado em esquemas técnicos (Doutor-IE, Simplo e Sabó), sem travar em páginas pagas.</p></div>', unsafe_allow_html=True)
+    aba_img.link_button("🔍 VER FOTOS DE SINCRONISMO", f"https://google.com{termo_completo_url}+doutor+ie+OR+simplo+OR+sabo+{exclusoes_pagas}")
     
     # Aba 4: Fóruns Mecânicos
     aba_forum.subheader("💬 Casos Resolvidos e Dicas de Bancada:")
-    aba_forum.markdown('<div class="card-tecnico"><h4>Fórum Oficina Brasil / Reparador</h4><p>Abre diretamente os tópicos de debates e macetes compartilhados entre mecânicos profissionais.</p></div>', unsafe_allow_html=True)
-    aba_forum.link_button("🔗 VER DISCUSSÕES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_limpo}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
+    aba_forum.markdown('<div class="card-tecnico"><h4>Fórum Oficina Brasil / Reparador</h4><p>Abre diretamente as discussões abertas e macetes de defeitos crônicos compartilhados entre mecânicos no fórum.</p></div>', unsafe_allow_html=True)
+    aba_forum.link_button("🔗 VER DISCUSSÕES NO FÓRUM OFICINA BRASIL", f"https://google.com{termo_completo_url}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br")
     
     # Aba 5: Vídeos Práticos
     aba_video.subheader("🎥 Tutoriais e Vídeos Passo a Passo:")
-    aba_video.markdown('<div class="card-tecnico"><h4>YouTube Mecânico</h4><p>Acesso à lista de vídeos e Shorts mostrando o procedimento real na oficina.</p></div>', unsafe_allow_html=True)
-    aba_video.link_button("🎥 ASSISTIR VÍDEOS NO YOUTUBE", f"https://youtube.com{termo_limpo}+procedimento+tecnico")
+    aba_video.markdown('<div class="card-tecnico"><h4>YouTube Mecânico</h4><p>Canal direto de passo a passo de montagem gravados em vídeo.</p></div>', unsafe_allow_html=True)
+    aba_video.link_button("🎥 ASSISTIR VÍDEOS NO YOUTUBE", f"https://youtube.com{veiculo_motor_url}+{urllib.parse.quote_plus(tipo_material)}+procedimento+tecnico")
