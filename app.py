@@ -123,16 +123,14 @@ tipo_material = st.sidebar.radio(
 
 st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
-incluir_manual_proprietario = st.sidebar.checkbox("Include Manual", value=False)
+incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DO COMANDO
+# 5. MONTAGEM DO COMANDO OTIMIZADO
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
-exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
+exclusoes_comercio = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
 
-if not incluir_manual_proprietario:
-    exclusoes_ajustadas += ' -"proprietario" -"usuario" -"condutor" -"owner"'
-
-comando_pesquisa = f'"{tipo_material}" "{fabricante_selecionada} {veiculo_selecionado}" motor "{motor_selecionado}" {texto_ano} manual técnico {exclusoes_ajustadas}'
+# Turbinamos o termo de busca para a IA entender que queremos fóruns e vídeos também
+comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos forum youtube {exclusoes_comercio}"
 
 # Painel Central de Informações
 col1, col2 = st.columns(2)
@@ -150,7 +148,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=15,
+                max_results=20, # Aumentado para abastecer todas as abas de verdade
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -169,11 +167,17 @@ if botao_buscar:
             
             plataformas_video = ["youtube", "youtu.be", "tiktok", "instagram", "kwai", "video"]
             sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube"]
+            termos_bloqueados_manuais = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
 
             for item in resultados:
                 link = item.get("url", "").lower()
                 titulo = item.get("title", "").lower()
                 
+                # 🚨 FILTRO FILTRO ANTI-INVASOR: Se a caixinha estiver desmarcada, descarta manuais de proprietário de forma radical!
+                if not incluir_manual_proprietario:
+                    if any(termo in titulo for termo in termos_bloqueados_manuais):
+                        continue # Pula este link e não joga em nenhuma aba
+
                 if any(p in link for p in plataformas_video) or "video" in titulo:
                     lista_videos.append(item)
                 elif link.endswith(".pdf") or "pdf" in titulo:
@@ -192,11 +196,3 @@ if botao_buscar:
                 if not lista_pdfs:
                     st.info("Nenhum arquivo PDF direto detectado.")
                 for item in lista_pdfs:
-                    st.markdown(f'<div class="card-tecnico"><h4>📄 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True)
-
-            with aba_img:
-                if not imagens_encontradas:
-                    st.info("Nenhuma imagem direta extraída.")
-                # 🚨 ALINHAMENTO BLINDADO: Imagens em formato de galeria vertical simples, imune a erros de tradutor 🚨
-                for img_url in imagens_encontradas[:6]:
-                    st.image(img_url, use_container_width=True)
