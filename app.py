@@ -17,13 +17,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<p class="main-title">⚙️ Central de Literatura Técnica Automotiva</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Garimpo de Diagramas de Sincronismo, Manuais de Reparação e Tabelas de Torque</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-title">Garimpo Inteligente Separado por Vídeos Práticos e Materiais Didáticos de Engenharia</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
 client = TavilyClient(api_key=TAVILY_API_KEY)
 
-# 3. BANCO DE DADOS 100% SEPARADO (Um único carro por linha)
+# 3. BANCO DE DADOS DETALHADO POR CARRO INDIVIDUAL
 dados_veiculos = {
     "Volkswagen": {
         "Gol": ["1.0 3cil EA211", "1.6 8V EA111", "1.0 8V EA111", "1.6 16V MSI EA211"],
@@ -68,48 +68,11 @@ dados_veiculos = {
         "S10": ["2.8 Duramax Diesel Turbodiesel", "2.4 Flexpower", "2.5 Ecotec SIDI Flex"],
         "Celta": ["1.0 8V VHC/VHC-E"],
         "Astra": ["2.0 8V Família 2"]
-    },
-    "Toyota": {
-        "Corolla": ["1.8 16V Dual VVT-i", "2.0 16V Dynamic Force", "2.0 16V Dual VVT-i (3ZR)"],
-        "Corolla Cross": ["2.0 16V Dynamic Force"],
-        "Hilux": ["2.8 D-4D 1GD-FTV (Corrente)", "3.0 D-4D 1KD-FTV (Correia)", "2.7 16V Flex Dual VVT-i"],
-        "SW4": ["2.8 D-4D 1GD-FTV", "3.0 D-4D 1KD-FTV"],
-        "Etios": ["1.3 16V Dual VVT-i", "1.5 16V Dual VVT-i"],
-        "Yaris": ["1.5 16V Dual VVT-i"]
-    },
-    "Honda": {
-        "Civic": ["1.8 16V i-VTEC (R18)", "2.0 16V i-VTEC (R20)", "1.5 16V Turbo (L15)", "1.7 16V (D17)"],
-        "Fit": ["1.4 8V/16V i-VTEC", "1.5 16V i-VTEC Flex"],
-        "City": ["1.5 16V i-VTEC Flex"],
-        "HR-V": ["1.8 16V i-VTEC", "1.5 16V Turbo VTEC"]
-    },
-    "Hyundai": {
-        "HB20": ["1.0 3cil Kappa 12V", "1.0 3cil Turbo Kappa", "1.6 16V Gamma"],
-        "Creta": ["1.6 16V Gamma", "2.0 16V Nu Flex", "1.0 3cil Turbo Kappa"],
-        "i30": ["2.0 16V Beta", "1.8 16V Nu", "1.6 Turbo GDI"],
-        "Tucson": ["2.0 16V Beta", "1.6 Turbo GDI"]
-    },
-    "Renault": {
-        "Kwid": ["1.0 3cil SCe B4D (Corrente)"],
-        "Sandero": ["1.0 3cil SCe", "1.6 16V SCe H4M", "1.6 16V Hi-Flex K4M"],
-        "Logan": ["1.0 3cil SCe", "1.6 16V SCe H4M"],
-        "Duster": ["2.0 16V F4R", "1.6 16V SCe", "1.3 Turbo TCe"],
-        "Master": ["2.3 dCi Turbo Diesel"]
-    },
-    "Peugeot": {
-        "208": ["1.2 3cil Puretech", "1.6 16V EC5 Flex", "1.0 Firefly Flex"],
-        "2008": ["1.6 16V EC5", "1.6 16V THP Turbo"],
-        "308": ["1.6 16V THP Turbo", "2.0 16V EW10"]
-    },
-    "Citroën": {
-        "C3": ["1.2 3cil Puretech", "1.6 16V EC5", "1.0 Firefly Flex"],
-        "C4 Cactus": ["1.6 16V EC5", "1.6 16V THP Turbo"],
-        "C4 Lounge": ["1.6 16V THP Turbo"]
     }
 }
 
-# 4. CRIAÇÃO DOS CAMPOS VISUAIS EM COLUNAS
-st.sidebar.header("📋 Filtros de Seleção Técnico")
+# 4. CRIAÇÃO DOS CAMPOS VISUAIS (Barra Lateral)
+st.sidebar.header("📋 Filtros de Seleção Técnica")
 
 lista_fabricantes = sorted(list(dados_veiculos.keys()))
 fabricante_selecionada = st.sidebar.selectbox("1. Escolha a Fabricante:", lista_fabricantes)
@@ -132,33 +95,42 @@ tipo_material = st.sidebar.radio(
     ]
 )
 
-# 5. CONFIGURAÇÃO DA CONSULTA RESTRITA
-comando_pesquisa = (
-    f'"{tipo_material}" motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} '
-    f'ano {ano_selecionado} "manual técnico" OR "esquema técnico" OR "ponto de sincronismo" '
-    f'-site:mercadolivre.com.br -site:olx.com.br -site:shopee.com.br -site:aliexpress.com '
-    f'-site:americanas.com.br -site:magazineluiza.com.br -site:autodoc.pt -site:pecasauto.pt'
+st.sidebar.write("---")
+st.sidebar.subheader("⚙️ Configurações Extra")
+# 🚨 NOVA REGULAGEM: Manual do proprietário desmarcado por padrão (Filtro Inteligente)
+incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
+
+# 5. MONTAGEM DA CONSULTA DINÂMICA COM EXCLUSÕES
+exclusoes = (
+    "-site:mercadolivre.com.br -site:olx.com.br -site:shopee.com.br -site:aliexpress.com "
+    "-site:americanas.com.br -site:magazineluiza.com.br -site:autodoc.pt -site:pecasauto.pt"
 )
 
-# 🚨 LINHA CORRIGIDA COM O NÚMERO 2 DENTRO DOS PARÊNTESES 🚨
+if not incluir_manual_proprietario:
+    exclusoes += ' -"manual do proprietario" -"manual de usuario" -"manual do condutor"'
+
+comando_pesquisa = (
+    f'"{tipo_material}" motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} '
+    f'ano {ano_selecionado} "manual técnico" OR "esquema técnico" OR "pontos" OR "youtube.com" {exclusoes}'
+)
+
+# Painel Central de Informações
 col1, col2 = st.columns(2)
-
 with col1:
-    st.info(f"⚙️ **Configuração Mecânica Atualizada:**\n\n*{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado} ({ano_selecionado})* \n\n🔹 *Buscando: {tipo_material}*")
-
+    st.info(f"⚙️ **Filtro Selecionado:**\n\n*{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado} ({ano_selecionado})*\n\n🛠️ *Componente: {tipo_material}*")
 with col2:
     st.write("")
     st.write("")
-    botao_buscar = st.button("🚀 Garimpar Literatura Técnica", use_container_width=True)
+    botao_buscar = st.button("🚀 Garimpar Literatura Avançada", use_container_width=True)
 
-# 6. PROCESSAMENTO E FILTRAGEM DOS RESULTADOS
+# 6. PROCESSAMENTO E EXIBIÇÃO EM ABAS SEPARADAS
 if botao_buscar:
-    with st.spinner("🤖 Vasculhando bancos de dados técnicos e manuais de reparação..."):
+    with st.spinner("🤖 Vasculhando acervos de engenharia e plataformas didáticas..."):
         try:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=5
+                max_results=8 # Aumentado para trazer mais opções visuais
             )
             resultados = resposta_ia.get("results", [])
         except Exception as e:
@@ -166,18 +138,45 @@ if botao_buscar:
             resultados = []
 
         if not resultados:
-            st.error("❌ Nenhuma literatura técnica oficial ou imagem de ponto de referência foi localizada para este motor.")
+            st.error("❌ Nenhuma literatura ou vídeo foi localizado para essa configuração de motor.")
         else:
-            st.success(f"✅ Sucesso! Encontramos {len(resultados)} literaturas compatíveis para a montagem.")
-            st.write("---")
+            # Separa os resultados em listas de mídias diferentes
+            lista_videos = []
+            lista_manuais = []
             
-            for i, item in enumerate(resultados):
-                titulo = item.get("title")
-                link = item.get("url")
-                resumo = item.get("content")
-                
-                with st.container():
-                    st.markdown(f"### 📄 {i+1}. {titulo}")
-                    st.write(f"**Especificações Extraídas:** {resumo}")
-                    st.markdown(f"📥 **[Clique aqui para abrir o Diagrama / Manual de Reparação]({link})**")
-                    st.write("---")
+            for item in resultados:
+                link = item.get("url", "")
+                if "youtube.com" in link.lower() or "youtu.be" in link.lower():
+                    lista_videos.append(item)
+                else:
+                    lista_manuais.append(item)
+            
+            # 🚨 SISTEMA DE ABAS PROFISSIONAIS NO PAINEL PRINCIPAL 🚨
+            aba_manuais, aba_videos = st.tabs(["📚 Literaturas e Manuais Didáticos", "🎥 Vídeos Práticos e Macetes"])
+            
+            # Exibição na Aba de Manuais
+            with aba_manuais:
+                if not lista_manuais:
+                    st.info("Nenhum arquivo de manual em PDF foi encontrado para este termo.")
+                else:
+                    st.success(f"Encontramos {len(lista_manuais)} esquemas técnicos didáticos:")
+                    for i, item in enumerate(lista_manuais):
+                        with st.container():
+                            st.markdown(f"#### 📄 {i+1}. {item.get('title')}")
+                            st.write(f"**Trecho do Material:** {item.get('content')}")
+                            st.markdown(f"📥 **[Abrir Literatura / Esquema Técnico]({item.get('url')})**")
+                            st.write("---")
+            
+            # Exibição na Aba de Vídeos
+            with aba_videos:
+                if not lista_videos:
+                    st.info("Nenhum vídeo técnico explicativo foi encontrado para este motor.")
+                else:
+                    st.success(f"Encontramos {len(lista_videos)} vídeos com o procedimento prático:")
+                    for i, item in enumerate(lista_videos):
+                        with st.container():
+                            st.markdown(f"#### 🎥 {i+1}. {item.get('title')}")
+                            st.write(f"**Dica do vídeo:** {item.get('content')}")
+                            # Renderiza o reprodutor de vídeo do YouTube direto na tela da oficina!
+                            st.video(item.get('url'))
+                            st.write("---")
