@@ -109,7 +109,7 @@ dados_veiculos = {
 }
 
 # 4. CRIAÇÃO DOS CAMPOS VISUAIS EM COLUNAS
-st.sidebar.header("📋 Filtros de Seleção Técnica")
+st.sidebar.header("📋 Filtros de Seleção Técnico")
 
 lista_fabricantes = sorted(list(dados_veiculos.keys()))
 fabricante_selecionada = st.sidebar.selectbox("1. Escolha a Fabricante:", lista_fabricantes)
@@ -132,8 +132,7 @@ tipo_material = st.sidebar.radio(
     ]
 )
 
-# 5. CONFIGURAÇÃO DA CONSULTA RESTRITA (Bloqueando sites de vendas e focando em manuais)
-# Adicionado filtros negativos (-site) para banir e-commerce e focar em esquemas estilo Doutor IE e Simplo
+# 5. CONFIGURAÇÃO DA CONSULTA RESTRITA
 comando_pesquisa = (
     f'"{tipo_material}" motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} '
     f'ano {ano_selecionado} "manual técnico" OR "esquema técnico" OR "ponto de sincronismo" '
@@ -141,8 +140,9 @@ comando_pesquisa = (
     f'-site:americanas.com.br -site:magazineluiza.com.br -site:autodoc.pt -site:pecasauto.pt'
 )
 
-# Painel Central de Confirmação
-col1, col2 = st.columns()
+# 🚨 LINHA CORRIGIDA COM O NÚMERO 2 DENTRO DOS PARÊNTESES 🚨
+col1, col2 = st.columns(2)
+
 with col1:
     st.info(f"⚙️ **Configuração Mecânica Atualizada:**\n\n*{fabricante_selecionada} {veiculo_selecionado} {motor_selecionado} ({ano_selecionado})* \n\n🔹 *Buscando: {tipo_material}*")
 
@@ -176,7 +176,6 @@ if botao_buscar:
                 link = item.get("url")
                 resumo = item.get("content")
                 
-                # Exibição limpa em cartões focados em conteúdo técnico
                 with st.container():
                     st.markdown(f"### 📄 {i+1}. {titulo}")
                     st.write(f"**Especificações Extraídas:** {resumo}")
