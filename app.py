@@ -31,7 +31,6 @@ col_texto_topo.markdown('<p class="sub-title"><b>Módulo Remapeado de Alta Perfo
 TAVILY_API_KEY = "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"
 
 # 3. 🏁 BANCO DE DADOS DE CAMINHOS CURTOS (A memória da sua oficina!)
-# Sempre que encontrarmos um link espetacular, nós travamos ele aqui dentro para o app abrir na hora!
 caminhos_curtos = {
     "Chevrolet_Astra_2.0 8V Familia 2": {
         "diagramas": [
@@ -42,7 +41,7 @@ caminhos_curtos = {
             {"title": "Manual de Oficina Completo - Astra / Vectra (Scribd/Livre)", "url": "https://scribd.com"}
         ],
         "foruns": [
-            {"title": "Fórum Oficina Brasil: Macete do Tensionador Astra 2.0 Flex", "url": "https://oficinabrasil.com.brforum/"}
+            {"title": "Fórum Oficina Brasil: Macete do Tensionador Astra 2.0 Flex", "url": "https://oficinabrasil.com.br"}
         ],
         "videos": [
             {"title": "Vídeo Passo a Passo Sincronismo Astra 2.0 8V", "url": "https://youtube.com"}
@@ -56,7 +55,7 @@ caminhos_curtos = {
             {"title": "Apostila de Treinamento Técnico VW: Motores EA211 PDF", "url": "https://manualdomecanico.com.br"}
         ],
         "foruns": [
-            {"title": "Reparador VW: Sincronismo EA211 sem ferramenta é possível?", "url": "https://oficinabrasil.com.brforum/"}
+            {"title": "Reparador VW: Sincronismo EA211 sem ferramenta é possível?", "url": "https://oficinabrasil.com.br"}
         ],
         "videos": [
             {"title": "Troca da Correia Dentada EA211 3cil - O Mecânico", "url": "https://youtube.com"}
@@ -114,8 +113,6 @@ if botao_buscar:
     # 🚨 PASSO 1: VERIFICA SE O CARRO ESTÁ NA MEMÓRIA DE CAMINHOS CURTOS 🚨
     if chave_memoria in caminhos_curtos:
         st.success("🏁 MEMÓRIA DE BANCADA ATIVA! Entregando caminhos curtos armazenados instantaneamente.")
-        
-        # Puxa os dados direto do nosso banco fixo sem buscar na web
         dados_fixos = caminhos_curtos[chave_memoria]
         
         aba_diag, aba_pdf, aba_forum, aba_video = st.tabs([
@@ -139,36 +136,31 @@ if botao_buscar:
     # 🚨 PASSO 2: SE NÃO ESTIVER NA MEMÓRIA, ACIONA O GARIMPEIRO NA WEB 🚨
     else:
         with st.spinner("🤖 Carro novo na oficina! Graxinim garimpando rotas abertas na internet..."):
-            # Filtro focado estritamente em domínios de mecânica confiáveis do Brasil
+            exclusoes = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
             comando_pesquisa = (
                 f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} "
                 f"\"manual de oficina\" OR \"ponto de sincronismo\" site:manualdomecanico.com.br OR site:oficinabrasil.com.br OR site:omecanico.com.br"
             )
             
             try:
-                resposta_ia = requests.post("https://tavily.com", json={"api_key": TAVILY_API_KEY, "query": comando_pesquisa, "search_depth": "advanced", "max_results": 10}).json()
+                # 🔥 URL CORRIGIDA PARA API DA TAVILY E ADICIONADO ENTREGA DE IMAGENS MINIATURAS 🔥
+                resposta_ia = requests.post("https://tavily.com", json={"api_key": TAVILY_API_KEY, "query": comando_pesquisa, "search_depth": "advanced", "max_results": 15, "include_images": True}).json()
                 resultados = resposta_ia.get("results", [])
+                images = resposta_ia.get("images", [])
             except:
-                resultados = []
+                resultados, images = [], []
 
             if not resultados:
                 st.error("❌ Nenhuma rota limpa foi localizada pelo Garimpeiro para este motor novo. Tente termos aproximados.")
             else:
-                aba_diag, aba_pdf, aba_forum, aba_video = st.tabs([
-                    "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "💬 3. Fóruns Mecânicos", "🎥 4. Vídeos e Macetes"
+                aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
+                    "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
                 ])
                 
-                # Distribui os resultados encontrados na web de forma segura
-                for item in resultados:
-                    link = item.get("url", "")
-                    titulo = item.get("title", "")
-                    
-                    if "youtube" in link.lower() or "youtu.be" in link.lower():
-                        aba_video.markdown(f"#### 🎥 {titulo}")
-                        aba_video.video(link)
-                        aba_video.write("---")
-                    elif "forum" in link.lower() or "topico" in link.lower():
-                        aba_forum.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">💬 {titulo}</h4><a href="{link}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔗 Acessar Fórum</a></div>', unsafe_allow_html=True)
-                    elif "pdf" in link.lower() or "manual" in titulo.lower():
-                        aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📚 {titulo}</h4><a href="{link}" target="_blank" style="color:#3B82F6; font-weight:bold;">📥 Abrir Manual / PDF</a></div>', unsafe_allow_html=True)
-                    else:
+                # 🚨 INJEÇÃO INDEPENDENTE DE DADOS EM LINHA: À prova de quebras de tradutores do Chrome 🚨
+                [aba_video.markdown(f'#### 🎥 {r.get("title")}\n[🔗 Assistir Vídeo]({r.get("url")})\n---') for r in resultados if any(p in r.get("url","").lower() for p in ["youtube", "youtu.be", "tiktok"])]
+                [aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank">📥 Abrir Manual / PDF</a></div>', unsafe_allow_html=True) for r in resultados if "pdf" in r.get("url","").lower() or "manual" in r.get("title","").lower()]
+                [aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank">🔗 Acessar Fórum</a></div>', unsafe_allow_html=True) for r in resultados if any(f in r.get("url","").lower() for f in ["forum", "club", "clube", "topico"])]
+                [aba_diag.markdown(f'<div class="card-tecnico"><h4>📊 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank">🔍 Ver Imagem/Diagrama</a></div>', unsafe_allow_html=True) for r in resultados if any(d in r.get("title","").lower() for d in ["diagrama", "esquema", "ponto", "foto"])]
+                
+                # Injeta os Previews de imagens na aba 3 de miniaturas
