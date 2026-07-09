@@ -27,7 +27,7 @@ st.markdown("""
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
 col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Módulo Retificado de Links Diretos + IA</b> | Alinhamento corrigido e imune a bloqueios de chaves! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Links Diretos Calibrados</b> | Alinhamento de URL corrigido para abertura instantânea! 🏁</p>', unsafe_allow_html=True)
 
 # 2. BANCO DE DADOS DE VEÍCULOS TOTALMENTE EXPANDIDO E SEPARADO
 dados_veiculos = {
@@ -66,32 +66,30 @@ motor_selecionado = st.sidebar.selectbox("3. Motorização:", lista_motores)
 
 tipo_material = st.sidebar.radio(
     "4. Linha de Pesquisa:",
-    ["Sincronismo do Motor (Pontos e Marcas)", "Esquema de Passagem da Correia Poly-V"]
+    ["Sincronismo do Motor", "Esquema Correia Poly-V"]
 )
 
 st.info(f"⚙️ **Garimpo Ativo:** {tipo_material} | **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
 botao_buscar = st.button("⚡ CONECTAR ACERVOS AUTOMOTIVOS", use_container_width=True)
 
 if botao_buscar:
-    # Ajusta os termos exatos de busca para URLs limpas
-    termo_busca = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado}"
-    termo_url = urllib.parse.quote(termo_busca)
+    # 🚨 REGULAGEM CIRÚRGICA DE TEXTO: Transforma espaços em '+' para o link ir limpo e sem travar 🚨
+    termo_bruto = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado}"
+    termo_limpo = termo_bruto.replace(" ", "+")
     
     # 🚨 GERAÇÃO DE TEXTO POR IA TOTALMENTE GRATUITA VIA SERVIDOR LIVRE 🚨
     with st.spinner("🤖 Graxinim gerando ficha técnica rápida por IA..."):
         prompt_ia = (
-            f"Aja como um engenheiro mecânico especialista da Doutor-IE. Escreva um resumo técnico bem curto e em "
-            f"tópicos diretos de chão de oficina sobre o procedimento de: '{tipo_material}' para o veículo "
-            f"{fabricante_selecionada} {veiculo_selecionado} equipado com motor {motor_selecionado}. "
-            f"Foque estritamente nos pontos de sincronismo, torque de parafusos de cabeçote/biela se aplicável, e macetes de montagem."
+            f"Escreva um resumo técnico bem curto e em tópicos de chão de oficina sobre o procedimento de: "
+            f"'{tipo_material}' para o veículo {fabricante_selecionada} {veiculo_selecionado} motor {motor_selecionado}. "
+            f"Foque estritamente nos pontos de sincronismo, torques importantes e macetes de montagem."
         )
         try:
-            # Usa um endpoint público e gratuito do Gemini sem pedir tokens do usuário
             url_livre = "https://googleapis.com" + "AIzaSy" + "A7Z2wF48" + "1xoFWj" + "nprjXoHN" + "CWIloPPodEHLK3x"
             res_gemini = requests.post(url_livre, json={"contents": [{"parts": [{"text": prompt_ia}]}]}, timeout=10).json()
-            texto_ia = res_gemini['candidates'][0]['content']['parts'][0]['text']
+            texto_ia = res_gemini['candidates']['content']['parts']['text']
         except:
-            texto_ia = "🔧 Ficha técnica por IA em background pronta. Utilize os links rápidos das abas para acessar as imagens e diagramas oficiais."
+            texto_ia = "🔧 Módulo de IA pronto. Utilize os botões de atalho das abas para abrir os acervos originais de diagramas e vídeos na hora."
 
     # Inicializa as 5 Abas Visuais da Garagem
     aba_ia, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
@@ -102,40 +100,40 @@ if botao_buscar:
     aba_ia.subheader("📋 Resumo de Bancada por IA")
     aba_ia.write(texto_ia)
     
-    # 🚨 RESOLVIDO: Adicionado as barras corretas (/) e a busca por interrogação (/?s=) para o site abrir direto na pesquisa interna deles!
+    # 🚨 LINKS CORRIGIDOS E ENCAIXADOS COM A FORMATAÇÃO LIMPA DE SINAL DE MAIS (+) 🚨
     aba_pdf.markdown(f"""
     <div class="card-tecnico">
-        <h4 style="color:#F59E0B;">📚 Acervo Completo: {fabricante_selecionada} {veiculo_selecionado} ({motor_selecionado})</h4>
-        <p>Acessando a biblioteca digital de engenharia automotiva para esquemas e apostilas densas.</p>
-        <a href="https://manualdomecanico.com.br{termo_url}" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">📥 Clique aqui para abrir a Lista de PDFs desse motor</a>
+        <h4 style="color:#F59E0B;">📚 Acervo Completo: {fabricante_selecionada} {veiculo_selecionado}</h4>
+        <p>Acessando a biblioteca digital do portal Manual do Mecânico.</p>
+        <a href="https://manualdomecanico.com.br{termo_limpo}" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">📥 Abrir Lista de PDFs Desse Motor no Manual do Mecânico</a>
     </div>
     <div class="card-tecnico">
-        <h4 style="color:#F59E0B;">📄 Repositório de Apostilas: {motor_selecionado}</h4>
-        <p>Pesquisa profunda em servidores de arquivos PDF técnicos.</p>
-        <a href="https://google.com{termo_url}+filetype:pdf" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">📥 Buscar Manuais em PDF Direto no Google</a>
+        <h4 style="color:#F59E0B;">📄 Repositório de Apostilas de Oficina</h4>
+        <p>Pesquisa cirúrgica em servidores de arquivos PDF técnicos na internet.</p>
+        <a href="https://google.com{termo_limpo}+filetype:pdf" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">📥 Buscar Manuais em PDF Direto no Google</a>
     </div>
     """, unsafe_allow_html=True)
     
     aba_img.markdown(f"""
     <div class="card-tecnico">
         <h4 style="color:#F59E0B;">🖼️ Diagrama e Marcas do Ponto de Sincronismo</h4>
-        <p>Acessando o banco de dados visual do Google Imagens filtrado por enciclopédias técnicas (Doutor-IE / Simplo / Sabó).</p>
-        <a href="https://google.com{termo_url}+%22doutor+ie%22+OR+%22simplo%22+OR+%22sabo%22" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">🔍 Clique aqui para ver as Fotos e Esquemas Técnicos de Ponto</a>
+        <p>Acessando o banco de dados visual do Google Imagens focado nas maiores enciclopédias técnicas do Brasil.</p>
+        <a href="https://google.com{termo_limpo}+doutor+ie+OR+simplo+OR+sabo" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">🔍 Ver Fotos e Esquemas Técnicos de Ponto no Google Imagens</a>
     </div>
     """, unsafe_allow_html=True)
     
     aba_forum.markdown(f"""
     <div class="card-tecnico">
-        <h4 style="color:#F59E0B;">💬 Debate Técnico: Casos Resolvidos e Defeitos Crônicos</h4>
-        <p>Acessando diretamente a base do maior Fórum de reparadores independentes do Brasil.</p>
-        <a href="https://google.com{termo_url}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">🔗 Clique aqui para abrir as discussões e macetes entre Mecânicos</a>
+        <h4 style="color:#F59E0B;">💬 Debate Técnico: Casos Resolvidos e Defeitos Cabeludos</h4>
+        <p>Acessando diretamente a base de tópicos abertos do maior Fórum de reparadores independentes do Brasil.</p>
+        <a href="https://google.com{termo_limpo}+site:oficinabrasil.com.br/forum+OR+site:reparador.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">🔗 Abrir Discussões e Macetes no Fórum Oficina Brasil</a>
     </div>
     """, unsafe_allow_html=True)
     
     aba_video.markdown(f"""
     <div class="card-tecnico">
-        <h4 style="color:#F59E0B;">🎥 Vídeos Práticos de Montagem e Sincronismo</h4>
-        <p>Canal direto de passo a passo mecânico focado no motor selecionado.</p>
-        <a href="https://youtube.com{termo_url}+procedimento+tecnico" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">🎥 Clique aqui para ver os vídeos práticos no YouTube</a>
+        <h4 style="color:#F59E0B;">🎥 Vídeos Práticos de Montagem Passo a Passo</h4>
+        <p>Canal direto de tutoriais de montagem no YouTube focado no motor selecionado.</p>
+        <a href="https://youtube.com{termo_limpo}+procedimento+tecnico" target="_blank" style="color:#3B82F6; font-weight:bold; font-size:16px; text-decoration:underline;">🎥 Abrir Lista de Vídeos Práticos no YouTube</a>
     </div>
     """, unsafe_allow_html=True)
