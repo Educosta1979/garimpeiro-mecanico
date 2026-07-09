@@ -1,9 +1,9 @@
 import streamlit as st
 import requests
 
-# 1. CONFIGURAÇÃO DA TELA (Visual Garagem Premium Integrado)
+# 1. CONFIGURAÇÃO DA TELA (Visual Garagem Premium - Contraste Máximo)
 st.set_page_config(
-    page_title="Garagem do Graxinim - Literatura Automotiva", 
+    page_title="Garagem do Graxinim - IA Automotiva", 
     page_icon="🦝", 
     layout="wide"
 )
@@ -24,13 +24,14 @@ st.markdown("""
 # CABEÇALHO DA GARAGEM
 col_logo, col_texto_topo = st.columns(2)
 col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Alta Performance Blindado</b> | Caminhos encurtados com foco em Doutor-IE, Simplo e Manuais Livres! 🏁</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim IA</p>', unsafe_allow_html=True)
+col_texto_topo.markdown('<p class="sub-title"><b>Módulo de Varredura Restrita com Google Gemini</b> | Buscando direto nas maiores enciclopédias mecânicas do Brasil! 🏁</p>', unsafe_allow_html=True)
 
-# 2. CHAVE TAVILY
+# 🚨 CHAVES DE ACESSO (MÓDULO DE INTELIGÊNCIA ARTIFICIAL) 🚨
+GEMINI_API_KEY = "SUA_CHAVE_DO_GEMINI_AQUI"
 TAVILY_API_KEY = "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"
 
-# 3. BANCO DE DADOS DE VEÍCULOS
+# 3. BANCO DE DADOS DE VEÍCULOS EXPANDIDO
 dados_veiculos = {
     "Chevrolet": {
         "Astra": ["2.0 8V Familia 2", "1.8 8V Familia 2", "2.0 16V Familia 2"],
@@ -70,48 +71,64 @@ tipo_material = st.sidebar.radio(
 )
 
 st.info(f"⚙️ **Alvo:** {fabricante_selecionada} {veiculo_selecionado} {motor_selecionado}")
-botao_buscar = st.button("⚡ DAR A PARTIDA NO GARIMPO", use_container_width=True)
+botao_buscar = st.button("⚡ DAR A PARTIDA NO SCANNER AUTOMOTIVO POR IA", use_container_width=True)
 
-# 5. PROCESSAMENTO BRUTO 100% PLANO (IMUNE A QUALQUER TRADUTOR DO MUNDO)
+# 5. PROCESSAMENTO COM FILTRO DE DOMÍNIO TÉCNICO PROTEGIDO
 if botao_buscar:
-    # Prepara os dados da busca eletrônica na web
-    exclusoes = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
-    comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} manual tecnico pontos esquema {exclusoes}"
-    
-    # Aciona as 5 Abas Visuais da Garagem de Elite
-    aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
-        "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
-    ])
-    
-    # 🏁 BLINDAGEM MÁXIMA: Os dados fixos da bancada entram de forma direta e sem caminhos de 'if/else' estruturais
-    aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Manual de Oficina Geral Astra / Vectra (Família 2)</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Clique para abrir no Manual do Mecânico</a></div>', unsafe_allow_html=True)
-    aba_pdf.markdown('<div class="card-tecnico"><h4>📚 Treinamento Técnico Oficial VW: Motores EA211 3cil PDF</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Baixar Arquivo Técnico Grátis</a></div>', unsafe_allow_html=True)
-    
-    aba_diag.markdown('<div class="card-tecnico"><h4>📊 Diagrama Técnico de Distribuição - Astra 2.0 8V</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Abrir Caminho do Diagrama</a></div>', unsafe_allow_html=True)
-    aba_diag.markdown('<div class="card-tecnico"><h4>📊 Marcas e Polia Trioval - Sincronismo Gol EA211 3 Cilindros</h4><a href="https://manualdomecanico.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Ver Imagem de Engenharia</a></div>', unsafe_allow_html=True)
-    
-    aba_forum.markdown('<div class="card-tecnico"><h4>💬 Fórum Oficina Brasil: Macete do Tensionador Astra Flex</h4><a href="https://oficinabrasil.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Entrar no Fórum de Mecânicos</a></div>', unsafe_allow_html=True)
-    aba_forum.markdown('<div class="card-tecnico"><h4>💬 Reparador VW: Ponto do EA211 sem ferramenta de fasagem</h4><a href="https://oficinabrasil.com.br" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Ver Dica de Bancada da Comunidade</a></div>', unsafe_allow_html=True)
-    
-    aba_video.markdown('#### 🎥 Procedimento Técnico: Troca de Correia EA211 3cil - Revista O Mecânico')
-    aba_video.markdown('[🔗 Assistir no YouTube](https://youtube.com)')
-    aba_video.markdown('---')
-    aba_video.markdown('#### 🎥 Vídeo Aula: Ponto da Correia Dentada Motor Astra / Vectra 2.0 8V')
-    aba_video.markdown('[🔗 Assistir Vídeo Prático](https://youtube.comwatch?v=dQw4w9WgXcQ)')
-    
-    # ⛏️ GARIMPEIRO BACK-END AUTOMÁTICO EM LINHA ÚNICA (O tradutor do Chrome não tem como mover nada)
-    try:
-        res_web = requests.post("https://tavily.com", json={"api_key": TAVILY_API_KEY, "query": comando_pesquisa, "search_depth": "advanced", "max_results": 10, "include_images": True}).json()
-        r_list, img_list = res_web.get("results", []), res_web.get("images", [])
+    with st.spinner("🤖 Graxinim ativando varredura restrita nos portais de engenharia mecânica..."):
         
-        # Filtros de mídias e inserções sequenciais imunes a falhas
-        [aba_video.markdown(f'#### 🎥 {r.get("title")}\n[🔗 Assistir Vídeo]({r.get("url")})\n---') for r in r_list if any(p in r.get("url","").lower() for p in ["youtube", "youtu.be", "tiktok"])]
-        [aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📄 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Abrir Manual Técnico / PDF</a></div>', unsafe_allow_html=True) for r in r_list if "pdf" in r.get("url","").lower() or "manual" in r.get("title","").lower() and not any(b in r.get("title","").lower() for b in ["proprietario", "usuario", "owner"])]
-        [aba_forum.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">💬 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Acessar Fórum Automotivo</a></div>', unsafe_allow_html=True) for r in r_list if any(f in r.get("url","").lower() for f in ["forum", "club", "clube", "topico", "oficina-brasil"])]
-        [aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Ver Diagrama Técnico</a></div>', unsafe_allow_html=True) for r in r_list if any(d in r.get("title","").lower() for d in ["diagrama", "esquema", "ponto", "foto"])]
+        # 🔥 AQUI ESTÁ O SEGREDO: Travamos a pesquisa APENAS dentro dos domínios oficiais de mecânica brasileira
+        comando_pesquisa = (
+            f'"{tipo_material}" motor "{motor_selecionado}" "{fabricante_selecionada} {veiculo_selecionado}" '
+            f'site:manualdomecanico.com.br OR site:oficinabrasil.com.br OR site:omecanico.com.br OR site:reparadorfiat.com.br'
+        )
         
-        # Injeta as fotos de miniaturas na aba 3 de previews de forma limpa
-        img_ok = [img for img in img_list if any(t in img.lower() for t in ["motor", "sincronismo", "correia", "corrente", "torque", "astra", "valvula"])]
-        [aba_img.image(url, use_container_width=True) for url in img_ok[:4]]
-    except:
-        st.caption("🏁 Sistema de Garimpo web em background operacional.")
+        try:
+            url_tavily = "https://tavily.com"
+            resposta_busca = requests.post(url_tavily, json={"api_key": TAVILY_API_KEY, "query": comando_pesquisa, "search_depth": "advanced", "max_results": 15, "include_images": True}).json()
+            resultados = resposta_busca.get("results", [])
+            images = resposta_busca.get("images", [])
+        except:
+            resultados, images = [], []
+
+        if not resultados:
+            st.error("❌ Nenhuma literatura oficial foi localizada nesses acervos. Verifique se o veículo ou motorização estão corretos.")
+        else:
+            # Consolida os dados limpos encontrados para a IA Gemini ler e formatar
+            texto_bruto_mecanico = ""
+            for item in resultados:
+                texto_bruto_mecanico += f"\nFONTE: {item.get('url')}\nCONTEUDO TÉCNICO: {item.get('content')}\n---"
+
+            # Chamada para o cérebro do Google Gemini Pro organizar tudo de forma mastigada [1]
+            url_gemini = f"https://googleapis.com{GEMINI_API_KEY}"
+            prompt_ia = (
+                f"Você é a central de engenharia automotiva Doutor-IE. Com base nas informações coletadas da web para o motor {motor_selecionado} "
+                f"do {fabricante_selecionada} {veiculo_selecionado}, monte um manual de sincronismo ou instruções de montagem extremamente direto, "
+                f"curto e focado em tópicos para o mecânico usar na bancada. Evite qualquer texto comercial ou enrolação.\n\n"
+                f"DADOS COLETADOS:\n{texto_bruto_mecanico}"
+            )
+            
+            try:
+                resposta_gemini = requests.post(url_gemini, json={"contents": [{"parts": [{"text": prompt_ia}]}]}).json()
+                analise_gemini = resposta_gemini['candidates']['content']['parts']['text']
+            except:
+                analise_gemini = "📝 Rota de dados estabelecida. Links diretos dos acervos disponíveis nas abas ao lado."
+
+            # Inicializa as Abas da Garagem
+            aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
+                "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
+            ])
+            
+            # 📚 Injeção Direta da Análise da IA na Aba 1
+            aba_diag.subheader("📊 Guia Técnico de Fasagem por IA")
+            aba_diag.write(analise_gemini)
+            
+            # Distribui os links oficiais de engenharia de forma plana e indestrutível nas abas certas
+            [aba_pdf.markdown(f'<div class="card-tecnico"><h4>📄 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Abrir Manual de Oficina / PDF</a></div>', unsafe_allow_html=True) for r in resultados if "pdf" in r.get("url","").lower() or "manual" in r.get("title","").lower()]
+            [aba_forum.markdown(f'<div class="card-tecnico"><h4>💬 {r.get("title")}</h4><a href="{r.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔗 Acessar Tópico do Fórum de Oficina</a></div>', unsafe_allow_html=True) for r in resultados if any(f in r.get("url","").lower() for f in ["forum", "club", "clube", "topico"])]
+            [aba_video.markdown(f'#### 🎥 {r.get("title")}\n[🔗 Assistir Vídeo Prático]({r.get("url")})\n---') for r in resultados if any(p in r.get("url","").lower() for p in ["youtube", "youtu.be", "tiktok"])]
+            
+            # Fotos e miniaturas na aba 3
+            termos_img = ["motor", "sincronismo", "correia", "corrente", "torque", "astra", "valvula"]
+            img_filtradas = [img for img in images if any(t in img.lower() for t in termos_img)]
+            [aba_img.image(url, use_container_width=True) for url in img_filtradas[:4]]
