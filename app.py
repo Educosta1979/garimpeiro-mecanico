@@ -1,32 +1,41 @@
 import streamlit as st
 from tavily import TavilyClient
 
-# 1. CONFIGURAÇÃO DA TELA (Visual Oficina de Elite - Contraste Máximo)
+# 1. CONFIGURAÇÃO DA TELA (Layout Garagem Noturna - Tema Integrado de Fábrica)
 st.set_page_config(
     page_title="Garagem do Graxinim - Literatura Automotiva", 
     page_icon="🦝", 
     layout="wide"
 )
 
-# Estilização CSS de Alto Padrão (Fundo escuro, textos brancos e detalhes em amarelo)
+# Estilização CSS que amarra as cores da tela inteira (Área central e Menu Lateral)
 st.markdown("""
     <style>
-    .stApp { background-color: #1A1D20; color: #FFFFFF; }
+    /* Força o fundo escuro e texto branco no app inteiro, inclusive no menu lateral */
+    .stApp, [data-testid="stSidebar"], .stSidebar { background-color: #111827 !important; color: #FFFFFF !important; }
     .main-title { font-size:36px !important; font-weight: bold; color: #F59E0B; margin-bottom: 5px; text-shadow: 2px 2px 4px #000; }
-    .sub-title { font-size:16px !important; color: #E5E7EB; margin-bottom: 25px; }
-    .card-tecnico { background-color: #2D3135; padding: 18px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #4B5563; border-left: 6px solid #F59E0B; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
-    .stTabs [data-baseweb="tab-list"] { background-color: #2D3135; padding: 10px; border-radius: 8px; border: 1px solid #4B5563; }
+    .sub-title { font-size:16px !important; color: #9CA3AF; margin-bottom: 25px; }
+    
+    /* Configuração dos Cartões Técnicos */
+    .card-tecnico { background-color: #1F2937; padding: 18px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #374151; border-left: 6px solid #F59E0B; box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
+    
+    /* Configuração e Visibilidade das Abas */
+    .stTabs [data-baseweb="tab-list"] { background-color: #1F2937; padding: 10px; border-radius: 8px; border: 1px solid #374151; }
     .stTabs [data-baseweb="tab"] { color: #FFFFFF !important; font-weight: bold !important; font-size: 15px !important; }
     .stTabs [aria-selected="true"] { color: #F59E0B !important; border-bottom-color: #F59E0B !important; }
-    div[data-testid="stMarkdownContainer"] p { color: #FFFFFF !important; }
+    
+    /* Garante que todos os textos normais fiquem brancos para leitura */
+    div[data-testid="stMarkdownContainer"] p, label, .stSelectbox label { color: #FFFFFF !important; }
     </style>
 """, unsafe_allow_html=True)
 
 # CABEÇALHO DA GARAGEM
-col_logo, col_texto_topo = st.columns(2)
-col_logo.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0;'>🦝</h1>", unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
-col_texto_topo.markdown('<p class="sub-title"><b>O Primeiro Software Feito para Chão de Oficina</b> | Filtros limpos estilo Doutor-IE e Simplo sem enrolação comercial! 🔧🏁</p>', unsafe_allow_html=True)
+col_logo, col_texto_topo = st.columns([1, 6])
+with col_logo:
+    st.markdown("<h1 style='font-size: 80px; margin: 0; padding: 0; text-align: center;'>🦝</h1>", unsafe_allow_html=True)
+with col_texto_topo:
+    st.markdown('<p class="main-title">🛠️ Garagem do Graxinim</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title"><b>O Primeiro Software Feito para Chão de Oficina</b> | Filtros limpos estilo Doutor-IE e Simplo sem enrolação comercial! 🔧🏁</p>', unsafe_allow_html=True)
 
 # 2. CHAVE TAVILY
 TAVILY_API_KEY = "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"
@@ -62,7 +71,7 @@ dados_veiculos = {
     }
 }
 
-# 4. MONTAGEM DO MENU LATERAL
+# 4. MONTAGEM DO MENU LATERAL (Sidebar)
 st.sidebar.header("📋 Seleção Mecânica")
 
 lista_fabricantes = sorted(list(dados_veiculos.keys()))
@@ -89,13 +98,15 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. REFINAMENTO DE PALAVRAS-CHAVE
+# 5. MONTAGEM DO COMANDO (Injeção Regulada de Combustível)
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
 exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo -pecas -loja -produto"
 
+# Frase de busca calibrada para cruzar dados com esquemas e pontos de referência legítimos
 comando_pesquisa = (
-    f'"{tipo_material}" motor "{motor_selecionado}" "{fabricante_selecionada} {veiculo_selecionado}" {texto_ano} '
-    f'"ponto de sincronismo" OR "esquema técnico" OR "fasagem" {exclusoes_ajustadas}'
+    f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} "
+    f"manual oficina esquema pontos "
+    f'("doutor ie" OR "simplo" OR "dicatek" OR "mecanica 2000" OR "manualdomecanico") {exclusoes_ajustadas}'
 )
 
 # Painel Central de Informações
@@ -130,55 +141,41 @@ if botao_buscar:
             sites_foruns = ["forum", "oficina-brasil", "mecanicos", "reparador", "club", "clube", "topico", "comunidade"]
             termos_bloqueados = ["proprietario", "usuario", "condutor", "owner", "proprietário", "usuário"]
 
-            # Extrai apenas as palavras numéricas do motor escolhido para o pente fino rígido (ex: se for '2.0 8v', pega '2.0')
-            termo_motor_raiz = motor_selecionado.split()[0] 
-
             for item in resultados:
                 link = item.get("url", "")
                 titulo = item.get("title", "")
                 link_min = link.lower()
                 tit_min = titulo.lower()
                 
-                # 🛡️ PENTE FINO 1: Bloqueia manuais de proprietário
+                # Bloqueio de manuais de proprietário
                 if not incluir_manual_proprietario and any(t in tit_min for t in termos_bloqueados):
                     continue
 
-                # 🛡️ PENTE FINO 2: Se o link falar de outro motor intruso (ex: fala de 2.2 ou 16v estando no 2.0 8v), descarta!
-                if termo_motor_raiz not in tit_min and termo_motor_raiz not in link_min:
-                    continue
-                if "16v" in motor_selecionado.lower() and "8v" in tit_min:
-                    continue
-                if "8v" in motor_selecionado.lower() and "16v" in tit_min:
-                    continue
-
-                # Triagem limpa por gavetas de mídias
+                # Triagem direta por link e texto nas gavetas certas
                 if any(p in link_min for p in plataformas_video):
                     lista_videos.append(item)
                 elif any(f in link_min for f in sites_foruns) or any(f in tit_min for f in sites_foruns):
                     lista_foruns.append(item)
-                elif any(d in tit_min or d in link_min for d in ["diagrama", "esquema visual", "ponto de sincronismo", "imagem", "foto", "png", "jpg"]):
+                elif any(d in tit_min or d in link_min for d in ["diagrama", "esquema", "ponto", "sincronismo", "imagem", "foto", "png", "jpg"]):
                     lista_diagramas.append(item)
                 else:
                     lista_manuais.append(item)
             
-            # Inicializa as Abas
+            # Inicializa as Abas do Painel Principal
             aba_diag, aba_pdf, aba_img, aba_forum, aba_video = st.tabs([
                 "📊 1. Diagramas de Ponto", "📚 2. Manuais Completos", "🖼️ 3. Fotos e Miniaturas", "💬 4. Fóruns Mecânicos", "🎥 5. Vídeos e Macetes"
             ])
             
-            # 🚨 INJEÇÃO REMAPEADA COM LOOPS TRADICIONAIS LIVRES DE ERROS VISUAIS 🚨
-            
-            # Preenche Aba 1: Diagramas
+            # Injeta dados de forma simples e direta (Totalmente livre de erros visuais e à prova de tradutor)
             if not lista_diagramas:
                 aba_diag.info("Nenhum diagrama rápido isolado detectado.")
-            for diag in lista_diagramas:
-                aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {diag.get("title")}</h4><a href="{diag.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True)
+            for item in lista_diagramas:
+                aba_diag.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📊 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">🔍 Abrir Esquema Visual do Ponto</a></div>', unsafe_allow_html=True)
 
-            # Preenche Aba 2: Manuais
             if not lista_manuais:
                 aba_pdf.info("Nenhum manual de oficina completo listado.")
-            for man in lista_manuais:
-                aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📚 {man.get("title")}</h4><a href="{man.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold;">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True)
+            for item in lista_manuais:
+                aba_pdf.markdown(f'<div class="card-tecnico"><h4 style="color:#F59E0B;">📚 {item.get("title")}</h4><a href="{item.get("url")}" target="_blank" style="color:#3B82F6; font-weight:bold; text-decoration:underline;">📥 Abrir Apostila Técnica / PDF</a></div>', unsafe_allow_html=True)
 
-            # Preenche Aba 3: Imagens Miniaturas (Filtro Antiguaxinim integrado)
+            # Injeta as imagens encontradas na Aba 3
             termos_mecanicos = ["motor", "sincronismo", "correia", "corrente", "torque", "car", "auto", "mecanic", "astra", "chevrolet", "valvula", "passagem", "poly", "tensionador", "polia"]
