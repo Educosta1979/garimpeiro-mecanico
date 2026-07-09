@@ -125,12 +125,11 @@ st.sidebar.write("---")
 st.sidebar.subheader("⚙️ Opções Adicionais")
 incluir_manual_proprietario = st.sidebar.checkbox("Incluir Manual do Proprietário", value=False)
 
-# 5. MONTAGEM DO COMANDO OTIMIZADO
+# 5. MONTAGEM DO COMANDO
 texto_ano = "" if ano_selecionado == "Não Informar (Buscar Todos)" else f"ano {ano_selecionado}"
-exclusoes_comercio = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
+exclusoes_ajustadas = "-mercadolivre -olx -shopee -comprar -preco -venda -catalogo"
 
-# Turbinamos o termo de busca para a IA entender que queremos fóruns e vídeos também
-comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos forum youtube {exclusoes_comercio}"
+comando_pesquisa = f"{tipo_material} motor {motor_selecionado} {fabricante_selecionada} {veiculo_selecionado} {texto_ano} manual oficina esquema pontos forum youtube {exclusoes_ajustadas}"
 
 # Painel Central de Informações
 col1, col2 = st.columns(2)
@@ -148,7 +147,7 @@ if botao_buscar:
             resposta_ia = client.search(
                 query=comando_pesquisa,
                 search_depth="advanced",
-                max_results=20, # Aumentado para abastecer todas as abas de verdade
+                max_results=20,
                 include_images=True
             )
             resultados = resposta_ia.get("results", [])
@@ -158,7 +157,7 @@ if botao_buscar:
             resultados, imagens_encontradas = [], []
 
         if not resultados:
-            st.error("❌ Nenhuma literatura foi localizada na web.")
+            st.error("❌ Nenhuma literatura foi localizada na web para esta configuração.")
         else:
             lista_pdfs = []
             lista_foruns = []
@@ -173,10 +172,8 @@ if botao_buscar:
                 link = item.get("url", "").lower()
                 titulo = item.get("title", "").lower()
                 
-                # 🚨 FILTRO FILTRO ANTI-INVASOR: Se a caixinha estiver desmarcada, descarta manuais de proprietário de forma radical!
-                if not incluir_manual_proprietario:
-                    if any(termo in titulo for termo in termos_bloqueados_manuais):
-                        continue # Pula este link e não joga em nenhuma aba
+                if not incluir_manual_proprietario and any(termo in titulo for termo in termos_bloqueados_manuais):
+                    continue
 
                 if any(p in link for p in plataformas_video) or "video" in titulo:
                     lista_videos.append(item)
@@ -193,6 +190,8 @@ if botao_buscar:
             ])
             
             with aba_pdf:
-                if not lista_pdfs:
-                    st.info("Nenhum arquivo PDF direto detectado.")
-                for item in lista_pdfs:
+                if not lista_pdfs: st.info("Nenhum arquivo PDF direto detectado.")
+                # 🚨 ATUALIZAÇÃO BLINDADA: Loop condensado em uma única linha estrutural à prova de tradutor!
+                [st.markdown(f'<div class="card-tecnico"><h4>📄 {x.get("title")}</h4><a href="{x.get("url")}" target="_blank">📥 Abrir/Baixar o PDF</a></div>', unsafe_allow_html=True) for x in lista_pdfs]
+
+            with aba_img:
